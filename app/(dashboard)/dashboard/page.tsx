@@ -13,19 +13,21 @@ export default async function DashboardPage() {
   const property = properties?.[0];
 
   // Fetch units
-  const { data: units = [] } = await supabase
+  const { data: unitsData } = await supabase
     .from("units")
     .select("*")
     .eq("property_id", property?.id || "");
+  const units = unitsData || [];
 
   // Fetch work orders
-  const { data: workOrders = [] } = await supabase
+  const { data: workOrdersData } = await supabase
     .from("work_orders")
     .select("*")
     .eq("property_id", property?.id || "")
     .in("status", ["open", "assigned", "in_progress"]);
+  const workOrders = workOrdersData || [];
 
-  const occupiedUnits = units.filter((u) => u.status === "occupied").length;
+  const occupiedUnits = units.filter((u: any) => u.status === "occupied").length;
   const totalUnits = units.length || 4;
   const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
@@ -33,8 +35,8 @@ export default async function DashboardPage() {
   const rentDue = occupiedUnits * 1250;
   const rentCollected = Math.floor(rentDue * 0.8);
 
-  const urgentWorkOrders = (workOrders as any[]).filter(
-    (w) => w.priority === "urgent"
+  const urgentWorkOrders = workOrders.filter(
+    (w: any) => w.priority === "urgent"
   ).length;
 
   return (
