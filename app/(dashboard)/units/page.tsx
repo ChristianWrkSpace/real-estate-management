@@ -11,25 +11,28 @@ export default async function UnitsPage() {
   const property = properties?.[0];
 
   // Fetch units
-  const { data: units = [] } = await supabase
+  const { data: unitsData } = await supabase
     .from("units")
     .select("*")
     .eq("property_id", property?.id || "");
+  const units = unitsData || [];
 
   // Fetch leases and tenants
-  const { data: leases = [] } = await supabase
+  const { data: leasesData } = await supabase
     .from("leases")
     .select("*")
     .eq("property_id", property?.id || "");
+  const leases = leasesData || [];
 
-  const { data: tenants = [] } = await supabase
+  const { data: tenantsData } = await supabase
     .from("tenants")
     .select("*")
     .eq("property_id", property?.id || "");
+  const tenants = tenantsData || [];
 
-  const tenantMap = Object.fromEntries(tenants.map((t) => [t.id, t]));
+  const tenantMap = Object.fromEntries(tenants.map((t: any) => [t.id, t]));
   const leasesByUnit = Object.fromEntries(
-    units.map((u) => [u.id, leases.filter((l) => l.unit_id === u.id)])
+    units.map((u: any) => [u.id, leases.filter((l: any) => l.unit_id === u.id)])
   );
 
   return (
