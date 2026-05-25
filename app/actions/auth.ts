@@ -14,33 +14,54 @@ export async function signIn(formData: FormData) {
   try {
     const supabase = await createServerSupabaseClient();
 
-    // Try to sign in
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      // If user doesn't exist, try to sign up
-      if (error.message.includes("Invalid login credentials")) {
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (signUpError) {
-          return { success: false, error: signUpError.message };
-        }
-
-        return { success: true, user: signUpData.user };
-      }
-
       return { success: false, error: error.message };
     }
 
     return { success: true, user: data.user };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "Authentication failed" };
+  }
+}
+
+export async function signUp(formData: FormData) {
+  const email = formData.get("email")?.toString() || "";
+  const password = formData.get("password")?.toString() || "";
+  const name = formData.get("name")?.toString() || "";
+
+  if (!email || !password || !name) {
+    return { success: false, error: "Email, password, and name are required" };
+  }
+
+  if (password.length < 6) {
+    return { success: false, error: "Password must be at least 6 characters" };
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient();
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, user: data.user };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Sign up failed" };
   }
 }
 

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/app/actions/auth";
+import { signUp } from "@/app/actions/auth";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const [error, setError] = useState("");
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
@@ -15,14 +15,14 @@ export default function LoginPage() {
     setIsPending(true);
 
     const formData = new FormData(e.currentTarget);
-    const result = await signIn(formData);
+    const result = await signUp(formData);
 
     setIsPending(false);
 
     if (result.success) {
       router.push("/dashboard");
     } else {
-      setError(result.error || "Authentication failed");
+      setError(result.error || "Sign up failed");
     }
   }
 
@@ -42,17 +42,28 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4">
               <span className="text-xl">🏠</span>
             </div>
-            <h1 className="text-4xl font-bold text-white">PropMan OS</h1>
+            <h1 className="text-4xl font-bold text-white">Create Account</h1>
             <p className="mt-3 text-sm text-white/60 font-medium">
-              Property Management System
-            </p>
-            <p className="mt-1 text-xs text-white/40">
-              1304 Rosario St, Laredo TX 78040
+              Join PropMan OS
             </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-white/90">
+                Full Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                required
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                placeholder="John Doe"
+                disabled={isPending}
+              />
+            </div>
+
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-white/90">
                 Email Address
@@ -62,7 +73,7 @@ export default function LoginPage() {
                 name="email"
                 required
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                placeholder="demo@realestatemanagement.local"
+                placeholder="you@example.com"
                 disabled={isPending}
               />
             </div>
@@ -79,6 +90,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 disabled={isPending}
               />
+              <p className="text-xs text-white/40">At least 6 characters</p>
             </div>
 
             {error && (
@@ -96,31 +108,20 @@ export default function LoginPage() {
               {isPending ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Signing in...
+                  Creating account...
                 </span>
               ) : (
-                "Sign In"
+                "Create Account"
               )}
             </button>
           </form>
 
-          {/* Demo hint */}
-          <div className="mt-8 rounded-lg bg-white/[0.02] border border-white/5 p-4">
-            <p className="text-center text-xs font-medium text-white/60 mb-2">
-              📝 Demo Credentials
-            </p>
-            <div className="space-y-1 text-xs text-white/40 font-mono text-center">
-              <p>Email: <span className="text-white/60">demo@example.com</span></p>
-              <p>Password: <span className="text-white/60">demo1234</span></p>
-            </div>
-          </div>
-
-          {/* Signup link */}
+          {/* Login link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-white/60">
-              Don't have an account?{" "}
-              <a href="/signup" className="text-blue-400 hover:text-blue-300 font-semibold transition">
-                Sign up here
+              Already have an account?{" "}
+              <a href="/login" className="text-blue-400 hover:text-blue-300 font-semibold transition">
+                Sign in here
               </a>
             </p>
           </div>
