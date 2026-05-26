@@ -7,35 +7,39 @@ import YieldOptimizationCard, { type YieldOptimizationProps } from "@/components
 
 type TabKey = "capital" | "tax" | "yield";
 
-const TABS: {
+type Tab = {
   key: TabKey;
   label: string;
   hint: string;
-  /** active tab pill colors */
   pill: string;
-  /** outer panel glow ring when active */
   glow: string;
-}[] = [
+  dot: string;
+};
+
+const TABS: Tab[] = [
   {
     key: "capital",
     label: "Capital",
-    hint: "Refi / equity / LTV",
+    hint: "Refi · equity · LTV",
     pill: "border-emerald-400/40 bg-emerald-500/15 text-emerald-200",
-    glow: "border-emerald-400/25 shadow-[0_0_44px_rgba(16,185,129,0.10)]",
+    glow: "shadow-[0_0_48px_rgba(16,185,129,0.10)]",
+    dot: "bg-emerald-400",
   },
   {
     key: "tax",
     label: "Tax",
     hint: "Webb CAD assessment",
     pill: "border-amber-400/40 bg-amber-500/15 text-amber-200",
-    glow: "border-amber-400/25 shadow-[0_0_44px_rgba(245,158,11,0.10)]",
+    glow: "shadow-[0_0_48px_rgba(245,158,11,0.10)]",
+    dot: "bg-amber-400",
   },
   {
     key: "yield",
     label: "Yield",
     hint: "ZIP 78040 market rent",
     pill: "border-blue-400/40 bg-blue-500/15 text-blue-200",
-    glow: "border-blue-400/25 shadow-[0_0_44px_rgba(59,130,246,0.10)]",
+    glow: "shadow-[0_0_48px_rgba(59,130,246,0.10)]",
+    dot: "bg-blue-400",
   },
 ];
 
@@ -51,16 +55,19 @@ export default function GodModeTabs({ tax, capital, yieldData }: GodModeTabsProp
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border bg-white/[0.03] backdrop-blur-xl transition-all duration-300 ${activeTab.glow}`}
+      className={`rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md transition-all duration-300 hover:border-zinc-700 ${activeTab.glow}`}
     >
-      {/* Tab strip */}
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] bg-white/[0.02] px-5 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            ◢ God Mode
+      {/* Tab strip — no border-bottom; selection is shown by the pill color + dot */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4">
+        <div className="flex items-center gap-2.5">
+          <span
+            className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${activeTab.dot}`}
+          />
+          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+            God Mode
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {TABS.map((tab) => {
             const isActive = tab.key === active;
             return (
@@ -71,7 +78,7 @@ export default function GodModeTabs({ tax, capital, yieldData }: GodModeTabsProp
                 className={`group flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
                   isActive
                     ? tab.pill
-                    : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/[0.12] hover:bg-white/[0.06] hover:text-zinc-200"
+                    : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/70 hover:text-zinc-200"
                 }`}
                 aria-pressed={isActive}
               >
@@ -85,7 +92,7 @@ export default function GodModeTabs({ tax, capital, yieldData }: GodModeTabsProp
         </div>
       </div>
 
-      {/* Panel body */}
+      {/* Panel body — same surface, no divider */}
       <div className="p-5">
         {active === "capital" && <CapitalStrategyCard {...capital} />}
         {active === "tax" && <TaxIntelligenceCard {...tax} />}

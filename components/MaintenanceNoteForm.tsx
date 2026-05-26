@@ -55,16 +55,14 @@ export default function MaintenanceNoteForm({
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/60 via-orange-950/20 to-slate-900/60 p-5 backdrop-blur-2xl">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300/80">
-            ⚒ Maintenance Note
-          </span>
-          <p className="mt-1 text-xs text-white/50">
-            Logs a work order + (if amount entered) posts an expense to the unit's P&amp;L
-          </p>
-        </div>
+    <div className="h-full rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition hover:border-zinc-700">
+      <div className="mb-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-300/80">
+          ⚒ Maintenance Note
+        </p>
+        <p className="mt-1 text-xs text-zinc-500">
+          Logs a work order + (if cost entered) posts an expense to the unit&apos;s P&amp;L
+        </p>
       </div>
 
       <form onSubmit={submit} className="space-y-3">
@@ -124,12 +122,12 @@ export default function MaintenanceNoteForm({
         </Field>
 
         {error && (
-          <p className="rounded-md border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+          <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
             ⚠ {error}
           </p>
         )}
         {success && (
-          <p className="rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+          <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
             ✓ {success}
           </p>
         )}
@@ -137,7 +135,7 @@ export default function MaintenanceNoteForm({
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/15 transition hover:from-orange-600 hover:to-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/15 transition hover:from-emerald-600 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Logging…" : "Log Maintenance"}
         </button>
@@ -147,12 +145,12 @@ export default function MaintenanceNoteForm({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-orange-500 focus:bg-white/10 focus:outline-none";
+  "w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
         {label}
       </span>
       {children}
