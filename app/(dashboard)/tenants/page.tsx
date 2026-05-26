@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import RentLinkButton from "@/components/RentLinkButton";
 import LeasePdfUpload from "@/components/LeasePdfUpload";
+import OnboardInviteButton from "@/components/OnboardInviteButton";
 import { getLeaseDocumentMap } from "@/app/actions/leases";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +48,9 @@ export default async function TenantsPage() {
                 Lease PDF
               </th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">
+                Onboarding
+              </th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">
                 Rent Collection
               </th>
             </tr>
@@ -78,13 +82,16 @@ export default async function TenantsPage() {
                   />
                 </td>
                 <td className="px-6 py-4">
+                  <OnboardInviteButton tenantId={tenant.id} />
+                </td>
+                <td className="px-6 py-4">
                   <RentLinkButton tenantId={tenant.id} />
                 </td>
               </tr>
             ))}
             {tenantList.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-sm text-white/40">
+                <td colSpan={6} className="px-6 py-8 text-center text-sm text-white/40">
                   No tenants yet. Add your first tenant to get started.
                 </td>
               </tr>
