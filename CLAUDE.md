@@ -340,3 +340,59 @@ For issues or clarifications, refer to:
 1. This CLAUDE.md (source of truth)
 2. Git commit history (why decisions were made)
 3. Code comments (non-obvious logic only)
+
+---
+
+## 🧊 FROZEN STATE — Recovery Log (commit `2a353fc`, 2026-05-25)
+
+**Application layer is 100% stable.**
+
+- `npm run build` — clean (15/15 routes)
+- `npx tsc --noEmit` — clean
+- All migration files committed, all server actions wired, all UI shipped
+- Stripe + Argus + Ledger + Lease vault + Work Orders + God Mode widget — code-complete
+- Auto-deploys to Vercel from `main`
+
+**Structurally blocked only by external infrastructure.** No code change can unblock this — only two manual paste-once browser actions can.
+
+### 🟡 The 2-Tab Human Activation Checklist (~30 seconds)
+
+**Tab 1 — Supabase SQL Editor**
+1. Open https://supabase.com/dashboard/project/lxjqtijczzwrpyxhyrya/sql/new
+2. Open `supabase/migrations/014_unified_final_repair.sql` from this repo
+3. Copy entire file, paste into editor, click **Run**
+4. This recreates the dropped `transactions` table (with RLS) and adds the missing `property_id`/`tenant_id`/`category`/etc. columns to `vendors` and `work_orders`. Ends with `NOTIFY pgrst, 'reload schema'` so PostgREST picks up the changes immediately.
+
+**Tab 2 — Anthropic Console**
+1. Open https://console.anthropic.com/settings/billing
+2. Top up the credit balance (currently empty — every `claude-opus-4-7` call returns `400 invalid_request_error: "Your credit balance is too low"`)
+3. No env-var change needed — the existing key `sk-ant-api03-...iiw1agAA` in `.env.local` will start working the instant credits land
+
+### 🚀 The 3-Command Boot Sequence (run after both tabs are done)
+
+```bash
+cd /Users/andres/real-estate-management
+npx tsx seed-transactions.ts      # Step 1: ~$3,750 income, ~$2,280 expenses populated
+npx tsx scripts/seed-ops.ts       # Step 2: 3 Laredo vendors + 2 starter work orders
+npx tsx scripts/verify-audit.ts   # Step 3: live Argus narrative streams to terminal
+```
+
+The third command will print actual NOI / Cap Rate / Cash-on-Cash and Argus's Dorsey-style paragraph.
+
+### Verification
+
+```bash
+npx tsx scripts/probe-schema.ts   # all four tables should show present columns, zero missing
+```
+
+### Why we're here (one-paragraph history)
+
+Migrations `009`/`010`/`011` used `DO $$ BEGIN ... EXCEPTION WHEN duplicate_object ... END $$;` blocks for policies. Supabase SQL Editor runs every paste in a single transaction — if any *one* policy in the paste duplicated an existing one (e.g., `"Users can view their own profile"` from `001`), the whole transaction silently rolled back, including the `ALTER TABLE ADD COLUMN` statements that should have committed. Result: the user pasted "successfully" several times but columns and tables kept not actually existing. All migrations have since been refactored to the `DROP POLICY IF EXISTS` + `CREATE POLICY` pattern, which can never roll back on duplicates. Migration `014_unified_final_repair.sql` is the single bulletproof block to paste once and end the cycle.
+
+### What an autonomous AI session can NOT do here
+
+- Apply DDL to Supabase (no `SUPABASE_DB_URL`, no `SUPABASE_ACCESS_TOKEN`, `supabase` CLI is installed but not logged in — `supabase login` is interactive)
+- Top up Anthropic billing (no console access)
+- Trigger interactive OAuth (`! supabase login` in the prompt works for the user only)
+
+If you (Andres) want to enable autonomous DDL forever after the next session, drop `SUPABASE_DB_URL=postgresql://postgres.lxjqtijczzwrpyxhyrya:[DB_PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres` into `.env.local` — `scripts/apply-migrations.ts` already supports it.
