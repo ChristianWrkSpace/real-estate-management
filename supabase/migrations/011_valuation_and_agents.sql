@@ -33,16 +33,12 @@ CREATE INDEX IF NOT EXISTS idx_ai_logs_status
 
 ALTER TABLE ai_logs ENABLE ROW LEVEL SECURITY;
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can view ai_logs"
-    ON ai_logs FOR SELECT
-    USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can view ai_logs" ON public.ai_logs;
+CREATE POLICY "Owner and Manager can view ai_logs"
+  ON public.ai_logs FOR SELECT
+  USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can insert ai_logs"
-    ON ai_logs FOR INSERT
-    WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can insert ai_logs" ON public.ai_logs;
+CREATE POLICY "Owner and Manager can insert ai_logs"
+  ON public.ai_logs FOR INSERT
+  WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));

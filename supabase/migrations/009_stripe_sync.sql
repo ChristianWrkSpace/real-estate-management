@@ -24,9 +24,7 @@ CREATE TABLE IF NOT EXISTS stripe_events (
 
 ALTER TABLE stripe_events ENABLE ROW LEVEL SECURITY;
 
-DO $$ BEGIN
-  CREATE POLICY "Owner can view stripe events"
-    ON stripe_events FOR SELECT
-    USING (auth.uid() IN (SELECT id FROM users WHERE role = 'owner'));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner can view stripe events" ON public.stripe_events;
+CREATE POLICY "Owner can view stripe events"
+  ON public.stripe_events FOR SELECT
+  USING (auth.uid() IN (SELECT id FROM users WHERE role = 'owner'));

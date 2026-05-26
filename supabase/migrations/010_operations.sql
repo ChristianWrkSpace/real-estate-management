@@ -40,52 +40,38 @@ CREATE INDEX IF NOT EXISTS idx_work_orders_vendor_id ON work_orders(vendor_id);
 -- RLS
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can view vendors"
-    ON vendors FOR SELECT
-    USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can view vendors" ON public.vendors;
+CREATE POLICY "Owner and Manager can view vendors"
+  ON public.vendors FOR SELECT
+  USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can create vendors"
-    ON vendors FOR INSERT
-    WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can create vendors" ON public.vendors;
+CREATE POLICY "Owner and Manager can create vendors"
+  ON public.vendors FOR INSERT
+  WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can update vendors"
-    ON vendors FOR UPDATE
-    USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can update vendors" ON public.vendors;
+CREATE POLICY "Owner and Manager can update vendors"
+  ON public.vendors FOR UPDATE
+  USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner can delete vendors"
-    ON vendors FOR DELETE
-    USING (auth.uid() IN (SELECT id FROM users WHERE role = 'owner'));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner can delete vendors" ON public.vendors;
+CREATE POLICY "Owner can delete vendors"
+  ON public.vendors FOR DELETE
+  USING (auth.uid() IN (SELECT id FROM users WHERE role = 'owner'));
 
--- Tighten work_orders policies for the v2 flow (idempotent).
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can view work_orders"
-    ON work_orders FOR SELECT
-    USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager','maintenance')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+-- Tighten work_orders policies for the v2 flow.
+DROP POLICY IF EXISTS "Owner and Manager can view work_orders" ON public.work_orders;
+CREATE POLICY "Owner and Manager can view work_orders"
+  ON public.work_orders FOR SELECT
+  USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager','maintenance')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can create work_orders"
-    ON work_orders FOR INSERT
-    WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can create work_orders" ON public.work_orders;
+CREATE POLICY "Owner and Manager can create work_orders"
+  ON public.work_orders FOR INSERT
+  WITH CHECK (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager')));
 
-DO $$ BEGIN
-  CREATE POLICY "Owner and Manager can update work_orders"
-    ON work_orders FOR UPDATE
-    USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager','maintenance')));
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Owner and Manager can update work_orders" ON public.work_orders;
+CREATE POLICY "Owner and Manager can update work_orders"
+  ON public.work_orders FOR UPDATE
+  USING (auth.uid() IN (SELECT id FROM users WHERE role IN ('owner','manager','maintenance')));

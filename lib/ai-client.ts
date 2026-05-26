@@ -19,9 +19,13 @@ import {
   getFallbackChain,
 } from "./ai-provider";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+let _anthropic: Anthropic | null = null;
+function getAnthropic(): Anthropic {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _anthropic;
+}
 
 // Other provider SDKs (openai, @google/generative-ai, etc.) are loaded
 // lazily inside their per-provider methods so the bundle doesn't fail to
@@ -38,13 +42,20 @@ export class AIClient {
   }
 
   /**
-   * Main completion method - routes to appropriate provider
+   * Main completion method - routes to appropriate provider.
+   * Tracks visited models in a Set to prevent the fallback chain from
+   * looping (e.g. mistral → mixtral → llama → mistral).
    */
-  async complete(params: AICompletionParams): Promise<AICompletionResult> {
+  async complete(
+    params: AICompletionParams,
+    visited: Set<string> = new Set()
+  ): Promise<AICompletionResult> {
     const model = getModel(params.model);
     if (!model) {
       throw new Error(`Unknown model: ${params.model}`);
     }
+
+    visited.add(params.model);
 
     // Check cost cap (unless overridden)
     if (!this.killSwitchOff && this.dailySpent >= this.costCap) {
@@ -72,16 +83,28 @@ export class AIClient {
           return await this.completeWithAnthropic(params);
       }
     } catch (error) {
-      // Try fallback models
-      const fallbacks = getFallbackChain(params.model);
-      if (fallbacks.length > 0) {
-        console.warn(`Model ${params.model} failed, trying fallback: ${fallbacks[0]}`);
-        return this.complete({
-          ...params,
-          model: fallbacks[0],
-        });
+      // Try fallback models — skip any we've already tried and any whose
+      // provider has no API key set, to avoid pointless retries.
+      const next = getFallbackChain(params.model).find(
+        (m) => !visited.has(m) && this.providerKeyAvailable(getModel(m)?.provider)
+      );
+      if (next) {
+        console.warn(`Model ${params.model} failed, trying fallback: ${next}`);
+        return this.complete({ ...params, model: next }, visited);
       }
-      throw error;
+      throw error instanceof Error ? error : new Error(String(error));
+    }
+  }
+
+  private providerKeyAvailable(provider: string | undefined): boolean {
+    switch (provider) {
+      case "anthropic": return !!process.env.ANTHROPIC_API_KEY;
+      case "openai":    return !!process.env.OPENAI_API_KEY;
+      case "google":    return !!process.env.GOOGLE_API_KEY;
+      case "deepseek":  return !!process.env.DEEPSEEK_API_KEY;
+      case "groq":      return !!process.env.GROQ_API_KEY;
+      case "mistral":   return !!process.env.MISTRAL_API_KEY;
+      default:          return false;
     }
   }
 
@@ -115,7 +138,7 @@ export class AIClient {
       createParams.temperature = params.temperature;
     }
 
-    const response = await anthropic.messages.create(createParams);
+    const response = await getAnthropic().messages.create(createParams);
 
     const tokensIn = response.usage.input_tokens;
     const tokensOut = response.usage.output_tokens;
