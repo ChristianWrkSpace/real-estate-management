@@ -118,9 +118,9 @@ export default function TaxIntelligenceCard({
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300/80">
             ⛨ Tax Intelligence
           </span>
-          <span className="text-[10px] text-white/40">· Webb CAD</span>
+          <span className="text-[10px] text-zinc-500 dark:text-white/40">· Webb CAD</span>
           {cad?.tax_year && (
-            <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white/60">
+            <span className="rounded bg-zinc-200/60 dark:bg-white/10 px-1.5 py-0.5 text-[10px] text-zinc-600 dark:text-white/60">
               {cad.tax_year}
             </span>
           )}
@@ -136,7 +136,7 @@ export default function TaxIntelligenceCard({
       </div>
 
       {!cad && !isPending && (
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-zinc-500 dark:text-white/50">
           No CAD data yet. Click <span className="text-amber-300">Sync Now</span> to pull
           Webb County's assessment.
         </p>
@@ -152,9 +152,9 @@ export default function TaxIntelligenceCard({
           </div>
 
           {internalVsCad != null && (
-            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+            <div className="mt-3 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-3 py-2">
               <div className="flex items-baseline justify-between">
-                <span className="text-[11px] font-medium text-white/60">
+                <span className="text-[11px] font-medium text-zinc-600 dark:text-white/60">
                   Internal vs CAD market delta
                 </span>
                 <span
@@ -164,12 +164,12 @@ export default function TaxIntelligenceCard({
                 >
                   {internalVsCad >= 0 ? "+" : ""}
                   {fmtUsd(internalVsCad)}{" "}
-                  <span className="text-[11px] font-normal text-white/40">
+                  <span className="text-[11px] font-normal text-zinc-500 dark:text-white/40">
                     ({internalVsCadPct != null ? `${internalVsCadPct >= 0 ? "+" : ""}${internalVsCadPct.toFixed(1)}%` : "—"})
                   </span>
                 </span>
               </div>
-              <p className="mt-1 text-[10px] text-white/40">
+              <p className="mt-1 text-[10px] text-zinc-500 dark:text-white/40">
                 {internalVsCad > 0
                   ? "Your internal estimate exceeds the county's — protest leverage available."
                   : internalVsCad < 0
@@ -184,7 +184,7 @@ export default function TaxIntelligenceCard({
               className={`mt-3 rounded-lg border px-3 py-2 ${
                 deadlineUrgent
                   ? "border-rose-400/40 bg-rose-500/10 text-rose-200"
-                  : "border-white/10 bg-white/5 text-white/70"
+                  : "border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/70"
               }`}
             >
               <div className="flex items-center justify-between text-[11px]">
@@ -211,7 +211,7 @@ export default function TaxIntelligenceCard({
             </div>
           ) : null}
 
-          <div className="mt-3 flex items-center justify-between text-[10px] text-white/40">
+          <div className="mt-3 flex items-center justify-between text-[10px] text-zinc-500 dark:text-white/40">
             <span>
               Synced {relativeTime(synced)}
               {cad.parsed_by_model && ` · parsed by ${cad.parsed_by_model}`}
@@ -237,7 +237,7 @@ export default function TaxIntelligenceCard({
       )}
 
       {cad?.notes?.length ? (
-        <p className="mt-2 text-[10px] text-white/40">
+        <p className="mt-2 text-[10px] text-zinc-500 dark:text-white/40">
           {cad.notes.join(" · ")}
         </p>
       ) : null}
@@ -255,8 +255,8 @@ function MicroMetric({
   accent?: "indigo";
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">
+    <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-black/20 px-2.5 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/45">
         {label}
       </p>
       <p

@@ -21,7 +21,7 @@ const fmtPct = (n: number | null | undefined, frac = 1) =>
 
 const DELTA_BADGE: Record<UnitYieldRow["delta_label"], string> = {
   above: "border-emerald-400/40 bg-emerald-500/15 text-emerald-200",
-  at: "border-white/15 bg-white/5 text-white/70",
+  at: "border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/70",
   below: "border-rose-400/40 bg-rose-500/15 text-rose-200",
   vacant: "border-amber-400/40 bg-amber-500/15 text-amber-200",
 };
@@ -60,7 +60,7 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
             {isPending ? "Analyzing…" : "Run Analysis"}
           </button>
         </div>
-        <p className="mt-2 text-xs text-white/50">
+        <p className="mt-2 text-xs text-zinc-500 dark:text-white/50">
           Cross-reference active leases against the ZIP 78040 baseline ($950/mo
           2BR/1BA) to surface loss-to-lease leaks.
         </p>
@@ -105,7 +105,7 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-300/80">
               ⌬ Yield Optimization
             </span>
-            <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white/60">
+            <span className="rounded bg-zinc-200/60 dark:bg-white/10 px-1.5 py-0.5 text-[10px] text-zinc-600 dark:text-white/60">
               ZIP {analysis.zip}
             </span>
           </div>
@@ -181,14 +181,14 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
 
         {/* Per-unit rows (flagged-only by default) */}
         {analysis.rows.length > 0 && (
-          <div className="mt-3 rounded-lg border border-white/10 bg-black/20">
-            <div className="flex items-center justify-between border-b border-white/5 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-white/50">
+          <div className="mt-3 rounded-lg border border-zinc-200 dark:border-white/10 bg-black/20">
+            <div className="flex items-center justify-between border-b border-zinc-200 dark:border-white/5 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/50">
               <span>{showAll ? "All units" : "Action-required units"}</span>
               {analysis.flagged_units.length > 0 && analysis.rows.length > visibleRows.length && (
                 <button
                   type="button"
                   onClick={() => setShowAll(true)}
-                  className="rounded bg-white/5 px-2 py-0.5 text-[10px] font-normal text-white/60 hover:bg-white/10"
+                  className="rounded bg-zinc-100 dark:bg-white/5 px-2 py-0.5 text-[10px] font-normal text-zinc-600 dark:text-white/60 hover:bg-white/10"
                 >
                   Show all {analysis.rows.length}
                 </button>
@@ -197,13 +197,13 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
                 <button
                   type="button"
                   onClick={() => setShowAll(false)}
-                  className="rounded bg-white/5 px-2 py-0.5 text-[10px] font-normal text-white/60 hover:bg-white/10"
+                  className="rounded bg-zinc-100 dark:bg-white/5 px-2 py-0.5 text-[10px] font-normal text-zinc-600 dark:text-white/60 hover:bg-white/10"
                 >
                   Flagged only
                 </button>
               )}
             </div>
-            <ul className="divide-y divide-white/5">
+            <ul className="divide-y divide-zinc-200 dark:divide-white/5">
               {visibleRows.length === 0 ? (
                 <li className="px-3 py-3 text-center text-[11px] text-emerald-200/80">
                   ✓ All units at or above target — no action required.
@@ -214,18 +214,18 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
                     key={r.unit_id}
                     className="grid grid-cols-12 items-center gap-2 px-3 py-2 text-[11px]"
                   >
-                    <span className="col-span-2 font-semibold text-white">
+                    <span className="col-span-2 font-semibold text-zinc-900 dark:text-white">
                       #{r.unit_number}
-                      <span className="ml-1 text-[10px] text-white/40">
+                      <span className="ml-1 text-[10px] text-zinc-500 dark:text-white/40">
                         {r.bedrooms ?? "?"}BR/{r.bathrooms ?? "?"}BA
                       </span>
                     </span>
-                    <span className="col-span-3 text-white/70">
-                      <span className="text-white/40">cur</span>{" "}
+                    <span className="col-span-3 text-zinc-600 dark:text-white/70">
+                      <span className="text-zinc-500 dark:text-white/40">cur</span>{" "}
                       {fmtUsd(r.current_rent)}
                     </span>
-                    <span className="col-span-3 text-white/70">
-                      <span className="text-white/40">target</span>{" "}
+                    <span className="col-span-3 text-zinc-600 dark:text-white/70">
+                      <span className="text-zinc-500 dark:text-white/40">target</span>{" "}
                       <span className="font-semibold text-indigo-200">{fmtUsd(r.target_rent)}</span>
                     </span>
                     <span
@@ -239,7 +239,7 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
                             ? "at"
                             : `−${(r.loss_pct ?? 0).toFixed(0)}%`}
                     </span>
-                    <span className="col-span-2 text-right text-white/60">
+                    <span className="col-span-2 text-right text-zinc-600 dark:text-white/60">
                       {r.renewal_window_days != null && r.renewal_window_days >= 0
                         ? `renew ${r.renewal_window_days}d`
                         : r.renewal_window_days != null && r.renewal_window_days < 0
@@ -247,7 +247,7 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
                           : "—"}
                     </span>
                     {r.flags.length > 0 && (
-                      <ul className="col-span-12 mt-1 space-y-0.5 pl-4 text-[10px] text-white/55">
+                      <ul className="col-span-12 mt-1 space-y-0.5 pl-4 text-[10px] text-zinc-500 dark:text-white/55">
                         {r.flags.map((f, i) => (
                           <li key={i}>· {f}</li>
                         ))}
@@ -266,9 +266,9 @@ export default function YieldOptimizationCard({ initial }: YieldOptimizationProp
             <p className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-300/70">
               Argus-Yield narrative
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-white/85">{analysis.narrative}</p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-800 dark:text-white/85">{analysis.narrative}</p>
             {analysis.narrative_model && (
-              <p className="mt-1 text-[10px] text-white/40">
+              <p className="mt-1 text-[10px] text-zinc-500 dark:text-white/40">
                 {analysis.narrative_model} · ${analysis.narrative_cost_usd.toFixed(4)}
               </p>
             )}
@@ -303,8 +303,8 @@ function Micro({
           ? "text-indigo-200"
           : "text-fuchsia-100";
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">
+    <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-black/20 px-2.5 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/45">
         {label}
       </p>
       <p className={`mt-0.5 text-sm font-bold ${cls}`}>{value}</p>

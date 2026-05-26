@@ -25,7 +25,7 @@ export default function EnforcementMenu({
   const [success, setSuccess] = useState<{ url: string; vacateBy: string } | null>(null);
 
   if (!leaseId) {
-    return <span className="text-[10px] text-white/30">No active lease</span>;
+    return <span className="text-[10px] text-zinc-400 dark:text-white/30">No active lease</span>;
   }
 
   const issue = () => {
@@ -56,15 +56,15 @@ export default function EnforcementMenu({
         className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
           isDelinquent
             ? "border-rose-400/50 bg-rose-500/15 text-rose-200 hover:bg-rose-500/25"
-            : "border-white/15 bg-white/5 text-white/60 hover:bg-white/10"
+            : "border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/60 hover:bg-white/10"
         }`}
       >
         {isDelinquent ? `Enforcement · ${fmtUsd(pastDueAmount)} due` : "Enforcement ▾"}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-20 mt-1 w-72 rounded-xl border border-white/10 bg-slate-900/95 p-3 shadow-2xl backdrop-blur-xl">
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/50">
+        <div className="absolute right-0 top-full z-20 mt-1 w-72 rounded-xl border border-zinc-200 dark:border-white/10 bg-slate-900/95 p-3 shadow-2xl backdrop-blur-xl">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-white/50">
             Enforcement Options
           </p>
 
@@ -78,7 +78,7 @@ export default function EnforcementMenu({
               >
                 {isPending ? "Generating…" : `Generate 3-Day Notice to Vacate`}
               </button>
-              <p className="mt-2 text-[10px] text-white/45">
+              <p className="mt-2 text-[10px] text-zinc-500 dark:text-white/45">
                 Texas Property Code § 24.005. Statutory prerequisite to a forcible-detainer
                 suit in Webb County Justice Court. Past-due: <strong>{fmtUsd(pastDueAmount)}</strong>.
               </p>
@@ -112,7 +112,7 @@ export default function EnforcementMenu({
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="mt-2 w-full rounded text-[10px] text-white/40 hover:text-white/60"
+            className="mt-2 w-full rounded text-[10px] text-zinc-500 dark:text-white/40 hover:text-white/60"
           >
             close
           </button>

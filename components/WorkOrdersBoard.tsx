@@ -30,23 +30,27 @@ export type Vendor = {
 export type Unit = { id: string; unit_number: string };
 
 const COLUMNS: { key: string; label: string; accent: string }[] = [
-  { key: "open", label: "Open", accent: "border-amber-400/30 bg-amber-500/5" },
+  {
+    key: "open",
+    label: "Open",
+    accent: "border-amber-400/50 bg-amber-500/10 dark:border-amber-400/30 dark:bg-amber-500/5",
+  },
   {
     key: "in_progress",
     label: "In Progress",
-    accent: "border-blue-400/30 bg-blue-500/5",
+    accent: "border-blue-400/50 bg-blue-500/10 dark:border-blue-400/30 dark:bg-blue-500/5",
   },
   {
     key: "resolved",
     label: "Resolved",
-    accent: "border-emerald-400/30 bg-emerald-500/5",
+    accent: "border-emerald-400/50 bg-emerald-500/10 dark:border-emerald-400/30 dark:bg-emerald-500/5",
   },
 ];
 
 const PRIORITY_STYLE: Record<string, string> = {
   high: "bg-red-500/20 text-red-200 border-red-400/30",
   medium: "bg-amber-500/20 text-amber-200 border-amber-400/30",
-  low: "bg-white/10 text-white/70 border-white/20",
+  low: "bg-zinc-200/60 dark:bg-white/10 text-zinc-600 dark:text-white/70 border-zinc-300 dark:border-white/20",
 };
 
 function priorityClass(p: string) {
@@ -81,8 +85,8 @@ export default function WorkOrdersBoard({
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Work Orders</h1>
-          <p className="mt-1 text-white/60">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Work Orders</h1>
+          <p className="mt-1 text-zinc-600 dark:text-white/60">
             Dispatch vendors, track repairs, auto-log P&amp;L on resolve
           </p>
         </div>
@@ -102,10 +106,10 @@ export default function WorkOrdersBoard({
             className={`rounded-xl border ${col.accent} p-4 backdrop-blur-sm`}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-white/80">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-700 dark:text-white/80">
                 {col.label}
               </h2>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/70">
+              <span className="rounded-full bg-zinc-200/60 dark:bg-white/10 px-2 py-0.5 text-xs text-zinc-600 dark:text-white/70">
                 {(grouped[col.key] || []).length}
               </span>
             </div>
@@ -121,7 +125,7 @@ export default function WorkOrdersBoard({
                 />
               ))}
               {(grouped[col.key] || []).length === 0 && (
-                <p className="rounded-lg border border-dashed border-white/10 p-4 text-center text-xs text-white/30">
+                <p className="rounded-lg border border-dashed border-zinc-200 dark:border-white/10 p-4 text-center text-xs text-zinc-400 dark:text-white/30">
                   Empty
                 </p>
               )}
@@ -175,9 +179,9 @@ function OrderCard({
   };
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm">
+    <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/[0.05] p-4 backdrop-blur-sm">
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h3 className="text-sm font-semibold text-white">{order.title}</h3>
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">{order.title}</h3>
         <span
           className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${priorityClass(
             order.priority
@@ -188,15 +192,15 @@ function OrderCard({
       </div>
 
       {order.description && (
-        <p className="mb-3 line-clamp-2 text-xs text-white/60">{order.description}</p>
+        <p className="mb-3 line-clamp-2 text-xs text-zinc-600 dark:text-white/60">{order.description}</p>
       )}
 
-      <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] text-white/50">
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] text-zinc-500 dark:text-white/50">
         {unitLabel && (
-          <span className="rounded bg-white/10 px-2 py-0.5">Unit {unitLabel}</span>
+          <span className="rounded bg-zinc-200/60 dark:bg-white/10 px-2 py-0.5">Unit {unitLabel}</span>
         )}
         {order.estimated_cost != null && (
-          <span className="rounded bg-white/10 px-2 py-0.5">
+          <span className="rounded bg-zinc-200/60 dark:bg-white/10 px-2 py-0.5">
             Est ${Number(order.estimated_cost).toFixed(0)}
           </span>
         )}
@@ -213,7 +217,7 @@ function OrderCard({
             value={vendorChoice}
             onChange={(e) => handleAssign(e.target.value)}
             disabled={isPending}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-2 py-1.5 text-xs text-zinc-900 dark:text-white focus:border-blue-500 focus:outline-none disabled:opacity-50"
           >
             <option value="">
               {vendorName ? `Assigned: ${vendorName}` : "— assign vendor —"}
@@ -243,7 +247,7 @@ function OrderCard({
       )}
 
       {isResolved && vendorName && (
-        <p className="text-[11px] text-white/40">Resolved by {vendorName}</p>
+        <p className="text-[11px] text-zinc-500 dark:text-white/40">Resolved by {vendorName}</p>
       )}
     </div>
   );
@@ -358,7 +362,7 @@ function NewIssueModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 font-semibold text-white/80 transition hover:bg-white/10"
+            className="flex-1 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2 font-semibold text-zinc-700 dark:text-white/80 transition hover:bg-white/10"
           >
             Cancel
           </button>
@@ -411,7 +415,7 @@ function ResolveModal({
   return (
     <Modal onClose={onClose} title="Mark as Resolved">
       <form onSubmit={submit} className="space-y-4">
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-zinc-600 dark:text-white/60">
           Enter the final invoice amount. This will be auto-logged as a maintenance
           expense in the P&amp;L.
         </p>
@@ -437,7 +441,7 @@ function ResolveModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 font-semibold text-white/80 transition hover:bg-white/10"
+            className="flex-1 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2 font-semibold text-zinc-700 dark:text-white/80 transition hover:bg-white/10"
           >
             Cancel
           </button>
@@ -455,12 +459,12 @@ function ResolveModal({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50";
+  "w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-white/70">
         {label}
       </span>
       {children}
@@ -483,15 +487,15 @@ function Modal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-zinc-200 dark:border-white/10 bg-slate-900 p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">{title}</h2>
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-white/50 hover:bg-white/10 hover:text-white"
+            className="rounded p-1 text-zinc-500 dark:text-white/50 hover:bg-white/10 hover:text-white"
           >
             ✕
           </button>

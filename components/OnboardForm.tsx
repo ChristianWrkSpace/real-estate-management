@@ -61,9 +61,9 @@ export default function OnboardForm({
           ✓
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white">Welcome home.</h2>
-          <p className="mt-1 text-sm text-white/60">
-            Your lease for <strong className="text-white">Unit {context.unit.unit_number}</strong> at{" "}
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Welcome home.</h2>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-white/60">
+            Your lease for <strong className="text-zinc-900 dark:text-white">Unit {context.unit.unit_number}</strong> at{" "}
             {context.property.name} is now active.
           </p>
         </div>
@@ -89,14 +89,14 @@ export default function OnboardForm({
               href={done.documentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full rounded-xl border border-white/15 bg-white/5 px-6 py-2.5 text-center text-sm font-semibold text-white/80 transition hover:bg-white/10"
+              className="block w-full rounded-xl border border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 px-6 py-2.5 text-center text-sm font-semibold text-zinc-700 dark:text-white/80 transition hover:bg-white/10"
             >
               View your signed lease (PDF) ↗
             </a>
           )}
         </div>
 
-        <p className="pt-2 text-xs text-white/40">
+        <p className="pt-2 text-xs text-zinc-500 dark:text-white/40">
           A copy of everything was sent to {form.verifiedEmail}.
         </p>
       </div>
@@ -137,14 +137,14 @@ export default function OnboardForm({
         </Field>
       </div>
 
-      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10">
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 p-4 transition hover:bg-white/10">
         <input
           type="checkbox"
           checked={form.acceptedTerms}
           onChange={(e) => setForm({ ...form, acceptedTerms: e.target.checked })}
           className="mt-0.5 h-4 w-4 accent-blue-500"
         />
-        <span className="text-sm text-white/80">
+        <span className="text-sm text-zinc-700 dark:text-white/80">
           I have reviewed the lease above and agree to be bound by it. I understand that
           clicking <strong>Accept &amp; Activate Lease</strong> constitutes a legally
           binding electronic signature under the federal E-SIGN Act and Texas UETA.
@@ -165,7 +165,7 @@ export default function OnboardForm({
         {isPending ? "Activating your lease…" : "Accept & Activate Lease"}
       </button>
 
-      <p className="text-center text-[10px] text-white/40">
+      <p className="text-center text-[10px] text-zinc-500 dark:text-white/40">
         Your IP and timestamp will be recorded with your signature.
       </p>
     </form>
@@ -173,12 +173,12 @@ export default function OnboardForm({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50";
+  "w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-3 text-zinc-900 dark:text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-white/70">
         {label}
       </span>
       {children}

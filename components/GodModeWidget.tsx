@@ -72,7 +72,7 @@ export default function GodModeWidget({
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-300/80">
               ◢ God Mode
             </span>
-            <span className="text-xs text-white/40">· {propertyName}</span>
+            <span className="text-xs text-zinc-500 dark:text-white/40">· {propertyName}</span>
           </div>
           <button
             type="button"
@@ -101,33 +101,33 @@ export default function GodModeWidget({
 
         <YieldOptimizationCard {...yieldData} />
 
-        <div className="mt-5 border-t border-white/10 pt-4">
+        <div className="mt-5 border-t border-zinc-200 dark:border-white/10 pt-4">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex w-full items-center justify-between text-left text-sm font-semibold text-white/80 transition hover:text-white"
+            className="flex w-full items-center justify-between text-left text-sm font-semibold text-zinc-700 dark:text-white/80 transition hover:text-white"
           >
             <span className="flex items-center gap-2">
               <span className="text-indigo-300">⚡ AI Financial Insights</span>
               {report?.model && (
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-normal text-white/50">
+                <span className="rounded-full bg-zinc-200/60 dark:bg-white/10 px-2 py-0.5 text-[10px] font-normal text-zinc-500 dark:text-white/50">
                   {report.model}
                 </span>
               )}
               {report?.asOf && (
-                <span className="text-[10px] text-white/40">
+                <span className="text-[10px] text-zinc-500 dark:text-white/40">
                   as of {report.asOf}
                 </span>
               )}
             </span>
-            <span className="text-white/40">{open ? "▾" : "▸"}</span>
+            <span className="text-zinc-500 dark:text-white/40">{open ? "▾" : "▸"}</span>
           </button>
 
           {open && (
             <div className="mt-4 space-y-3">
               {report ? (
                 <>
-                  <p className="text-sm leading-relaxed text-white/85">
+                  <p className="text-sm leading-relaxed text-zinc-800 dark:text-white/85">
                     {report.narrative}
                   </p>
 
@@ -144,7 +144,7 @@ export default function GodModeWidget({
                     </ul>
                   )}
 
-                  <div className="grid grid-cols-2 gap-2 text-[11px] text-white/50 md:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] text-zinc-500 dark:text-white/50 md:grid-cols-4">
                     <Pill label="Income YTD" value={fmtUsd(report.gross_income_ytd)} />
                     <Pill label="Expenses YTD" value={fmtUsd(report.total_expenses_ytd)} />
                     <Pill label="Cash-on-Cash" value={fmtPct(report.cash_on_cash_pct)} />
@@ -155,7 +155,7 @@ export default function GodModeWidget({
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-white/50">
+                <p className="text-sm text-zinc-500 dark:text-white/50">
                   No audit yet. Click <span className="text-indigo-300">Run Argus Audit</span>{" "}
                   to generate one.
                 </p>
@@ -186,8 +186,8 @@ function Metric({
     purple: "text-purple-300",
   };
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
+    <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/50">
         {label}
       </p>
       <p className={`mt-1.5 text-2xl font-bold ${accentMap[accent]}`}>{value}</p>
@@ -197,9 +197,9 @@ function Metric({
 
 function Pill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded bg-white/5 px-2 py-1.5">
-      <p className="text-white/40">{label}</p>
-      <p className="font-semibold text-white/80">{value}</p>
+    <div className="rounded bg-zinc-100 dark:bg-white/5 px-2 py-1.5">
+      <p className="text-zinc-500 dark:text-white/40">{label}</p>
+      <p className="font-semibold text-zinc-700 dark:text-white/80">{value}</p>
     </div>
   );
 }

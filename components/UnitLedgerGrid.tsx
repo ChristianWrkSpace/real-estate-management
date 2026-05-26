@@ -15,13 +15,13 @@ const STATUS_BADGE: Record<UnitPnlRow["rent_status"], { label: string; cls: stri
   paid:    { label: "Paid",    cls: "border-emerald-400/40 bg-emerald-500/15 text-emerald-200" },
   partial: { label: "Partial", cls: "border-amber-400/40 bg-amber-500/15 text-amber-200" },
   due:     { label: "Due",     cls: "border-rose-400/40 bg-rose-500/15 text-rose-200" },
-  vacant:  { label: "Vacant",  cls: "border-white/15 bg-white/5 text-white/60" },
+  vacant:  { label: "Vacant",  cls: "border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/60" },
 };
 
 export default function UnitLedgerGrid({ data }: { data: PerUnitPnl | null }) {
   if (!data || data.units.length === 0) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-8 text-center text-sm text-white/40 backdrop-blur-sm">
+      <div className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.02] p-8 text-center text-sm text-zinc-500 dark:text-white/40 backdrop-blur-sm">
         No units configured yet.
       </div>
     );
@@ -36,8 +36,8 @@ export default function UnitLedgerGrid({ data }: { data: PerUnitPnl | null }) {
       </div>
 
       {data.totals.common_area_expenses_ytd > 0 && (
-        <div className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2.5 text-xs text-white/60 backdrop-blur-sm">
-          <span className="font-semibold text-white/80">Common-area expenses YTD:</span>{" "}
+        <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.02] px-4 py-2.5 text-xs text-zinc-600 dark:text-white/60 backdrop-blur-sm">
+          <span className="font-semibold text-zinc-700 dark:text-white/80">Common-area expenses YTD:</span>{" "}
           {fmtUsd(data.totals.common_area_expenses_ytd, 2)} (mortgage, insurance, property tax,
           landscaping — not attributed to a single unit)
         </div>
@@ -51,13 +51,13 @@ function UnitColumn({ u }: { u: UnitPnlRow }) {
   const cashFlowPositive = u.net_cash_flow_ytd >= 0;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-white/[0.04] backdrop-blur-xl transition hover:border-white/20">
+    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:border-zinc-300 dark:border-white/10 dark:bg-gradient-to-br dark:from-white/[0.04] dark:via-white/[0.02] dark:to-white/[0.04] dark:backdrop-blur-xl dark:hover:border-white/20 dark:shadow-none">
       {/* Header */}
-      <div className="border-b border-white/5 bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent p-4">
+      <div className="border-b border-zinc-200 bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent p-4 dark:border-white/5">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-white">Unit {u.unit_number}</h3>
-            <p className="text-[11px] text-white/50">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Unit {u.unit_number}</h3>
+            <p className="text-[11px] text-zinc-500 dark:text-white/50">
               {u.bedrooms ?? "?"}BR · {u.bathrooms ?? "?"}BA
             </p>
           </div>
@@ -68,11 +68,11 @@ function UnitColumn({ u }: { u: UnitPnlRow }) {
           </span>
         </div>
         {u.tenant_name ? (
-          <p className="mt-2 truncate text-xs text-white/70" title={u.tenant_name}>
+          <p className="mt-2 truncate text-xs text-zinc-600 dark:text-white/70" title={u.tenant_name}>
             👤 {u.tenant_name}
           </p>
         ) : (
-          <p className="mt-2 text-xs italic text-white/40">No active tenant</p>
+          <p className="mt-2 text-xs italic text-zinc-500 dark:text-white/40">No active tenant</p>
         )}
       </div>
 
@@ -93,7 +93,7 @@ function UnitColumn({ u }: { u: UnitPnlRow }) {
           value={fmtUsd(u.expenses_ytd, 2)}
           accent="rose"
         />
-        <div className="my-2 border-t border-white/5" />
+        <div className="my-2 border-t border-zinc-200 dark:border-white/5" />
         <Stat
           label="Net cash flow YTD"
           value={`${cashFlowPositive ? "+" : ""}${fmtUsd(u.net_cash_flow_ytd, 2)}`}
@@ -123,7 +123,7 @@ function UnitColumn({ u }: { u: UnitPnlRow }) {
           </p>
         )}
 
-        <div className="mt-3 space-y-0.5 text-[10px] text-white/40">
+        <div className="mt-3 space-y-0.5 text-[10px] text-zinc-500 dark:text-white/40">
           {u.last_rent_payment_at && (
             <p>Last income: {u.last_rent_payment_at}</p>
           )}
@@ -149,19 +149,19 @@ function Stat({
 }) {
   const accentCls =
     accent === "emerald"
-      ? "text-emerald-300"
+      ? "text-emerald-600 dark:text-emerald-300"
       : accent === "rose"
-        ? "text-rose-300"
-        : "text-white";
+        ? "text-rose-600 dark:text-rose-300"
+        : "text-zinc-900 dark:text-white";
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className="text-[11px] font-medium uppercase tracking-wide text-white/55">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-zinc-500 dark:text-white/55">
         {label}
       </span>
       <span className={`${big ? "text-lg font-bold" : "text-sm font-semibold"} ${accentCls}`}>
         {value}
         {suffix && (
-          <span className="ml-0.5 text-[10px] font-normal text-white/45">{suffix}</span>
+          <span className="ml-0.5 text-[10px] font-normal text-zinc-500 dark:text-white/45">{suffix}</span>
         )}
       </span>
     </div>

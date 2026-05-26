@@ -80,15 +80,15 @@ export default function AddTransactionModal({
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl"
+            className="w-full max-w-md rounded-2xl border border-zinc-200 dark:border-white/10 bg-slate-900 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">Add Transaction</h2>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Add Transaction</h2>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded p-1 text-white/50 hover:bg-white/10 hover:text-white"
+                className="rounded p-1 text-zinc-500 dark:text-white/50 hover:bg-white/10 hover:text-white"
               >
                 ✕
               </button>
@@ -104,7 +104,7 @@ export default function AddTransactionModal({
                   className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
                     form.type === "income"
                       ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-200"
-                      : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
+                      : "border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/60 hover:bg-white/10"
                   }`}
                 >
                   + Income
@@ -117,7 +117,7 @@ export default function AddTransactionModal({
                   className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
                     form.type === "expense"
                       ? "border-rose-400/50 bg-rose-500/20 text-rose-200"
-                      : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
+                      : "border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/60 hover:bg-white/10"
                   }`}
                 >
                   − Expense
@@ -213,7 +213,7 @@ export default function AddTransactionModal({
                   type="button"
                   onClick={() => setIsOpen(false)}
                   disabled={isPending}
-                  className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 font-semibold text-white/80 transition hover:bg-white/10"
+                  className="flex-1 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2 font-semibold text-zinc-700 dark:text-white/80 transition hover:bg-white/10"
                 >
                   Cancel
                 </button>
@@ -234,12 +234,12 @@ export default function AddTransactionModal({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-blue-500 focus:bg-white/10 focus:outline-none";
+  "w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-white/40 focus:border-blue-500 focus:bg-white/10 focus:outline-none";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-white/70">
         {label}
       </span>
       {children}

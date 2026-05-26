@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-4 text-white">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-4 text-zinc-900 dark:text-white">
       {/* Ambient gradient blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-32 -right-32 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl" />
@@ -53,14 +53,14 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         {/* Card */}
-        <div className="w-full rounded-2xl border border-white/10 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-md">
+        <div className="w-full rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-md">
           {/* Brand */}
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-blue-600 shadow-lg shadow-emerald-500/20">
               <span className="text-xl">🏠</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight">PropMan OS</h1>
-            <p className="mt-1 text-xs text-white/50">
+            <p className="mt-1 text-xs text-zinc-500 dark:text-white/50">
               1304 Rosario St · Laredo, TX 78040
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
           {/* Form */}
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-white/70">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-white/70">
                 Email
               </label>
               <input
@@ -80,12 +80,12 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isPending}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-white/30 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-white/70">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-white/70">
                 Password
               </label>
               <input
@@ -97,7 +97,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isPending}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-white/30 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60"
               />
             </div>
 
@@ -140,7 +140,7 @@ export default function LoginPage() {
                   <p className="text-xs font-bold uppercase tracking-wider text-emerald-200">
                     1-Click Demo Sign-In
                   </p>
-                  <p className="mt-0.5 font-mono text-[10px] text-white/55">
+                  <p className="mt-0.5 font-mono text-[10px] text-zinc-500 dark:text-white/55">
                     {DEMO_EMAIL}
                   </p>
                 </div>
@@ -152,7 +152,7 @@ export default function LoginPage() {
           </button>
 
           {/* Signup link */}
-          <p className="mt-5 text-center text-xs text-white/40">
+          <p className="mt-5 text-center text-xs text-zinc-500 dark:text-white/40">
             Need an account?{" "}
             <a
               href="/signup"
@@ -163,7 +163,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="mt-5 text-center text-[10px] text-white/30">
+        <p className="mt-5 text-center text-[10px] text-zinc-400 dark:text-white/30">
           Supabase Auth · Model-agnostic AI · Vercel
         </p>
       </div>

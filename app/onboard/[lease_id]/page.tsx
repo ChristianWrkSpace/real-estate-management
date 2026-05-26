@@ -38,15 +38,15 @@ export default async function OnboardPage({
             {context ? "Sign your lease" : "Invalid onboarding link"}
           </h1>
           {context && (
-            <p className="mt-2 text-sm text-white/60">
+            <p className="mt-2 text-sm text-zinc-600 dark:text-white/60">
               Welcome to {context.property.name} · Unit {context.unit.unit_number}
             </p>
           )}
         </div>
 
         {!context && (
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 text-center backdrop-blur-xl">
-            <p className="text-sm text-white/70">
+          <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-100/60 dark:bg-white/[0.04] p-8 text-center backdrop-blur-xl">
+            <p className="text-sm text-zinc-600 dark:text-white/70">
               This onboarding link is invalid, has already been used, or has expired.
               Please contact your landlord for a fresh link.
             </p>
@@ -59,10 +59,10 @@ export default async function OnboardPage({
               ✓
             </div>
             <h2 className="text-xl font-semibold">This lease is already active.</h2>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-zinc-600 dark:text-white/60">
               Signed on {new Date(context.signed_at).toLocaleDateString()}.
             </p>
-            <p className="mt-4 text-xs text-white/40">
+            <p className="mt-4 text-xs text-zinc-500 dark:text-white/40">
               Need to make a payment? Check your inbox for the rent portal link, or
               contact your landlord.
             </p>
@@ -72,7 +72,7 @@ export default async function OnboardPage({
         {context && !context.signed_at && (
           <>
             {/* Lease summary */}
-            <div className="mb-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+            <div className="mb-6 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-100/60 dark:bg-white/[0.04] p-6 backdrop-blur-xl">
               <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-blue-300/80">
                 Lease summary
               </h2>
@@ -102,41 +102,41 @@ export default async function OnboardPage({
             </div>
 
             {/* Terms preview */}
-            <details className="mb-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-xl">
-              <summary className="cursor-pointer text-sm font-semibold text-white/80 hover:text-white">
+            <details className="mb-6 rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.02] p-5 backdrop-blur-xl">
+              <summary className="cursor-pointer text-sm font-semibold text-zinc-700 dark:text-white/80 hover:text-white">
                 Read the full lease terms ▾
               </summary>
-              <div className="mt-4 space-y-3 text-xs leading-relaxed text-white/70">
+              <div className="mt-4 space-y-3 text-xs leading-relaxed text-zinc-600 dark:text-white/70">
                 <p>
-                  <strong className="text-white/90">1. Premises.</strong> Landlord rents to
+                  <strong className="text-zinc-800 dark:text-white/90">1. Premises.</strong> Landlord rents to
                   Tenant Unit {context.unit.unit_number} at the above address (the
                   "Premises").
                 </p>
                 <p>
-                  <strong className="text-white/90">2. Term.</strong>{" "}
+                  <strong className="text-zinc-800 dark:text-white/90">2. Term.</strong>{" "}
                   {context.end_date
                     ? `Fixed term from ${context.start_date} through ${context.end_date}.`
                     : `Month-to-month tenancy beginning ${context.start_date}.`}
                 </p>
                 <p>
-                  <strong className="text-white/90">3. Rent.</strong> Tenant agrees to pay{" "}
+                  <strong className="text-zinc-800 dark:text-white/90">3. Rent.</strong> Tenant agrees to pay{" "}
                   {fmtUsd(context.monthly_rent)} on the first of each month via the secure
                   Stripe payment portal provided after acceptance.
                 </p>
                 {context.security_deposit && context.security_deposit > 0 && (
                   <p>
-                    <strong className="text-white/90">4. Security deposit.</strong> A
+                    <strong className="text-zinc-800 dark:text-white/90">4. Security deposit.</strong> A
                     deposit of {fmtUsd(context.security_deposit)} is held by Landlord,
                     refundable per Texas Property Code §92.103.
                   </p>
                 )}
                 <p>
-                  <strong className="text-white/90">5. Maintenance.</strong> Landlord
+                  <strong className="text-zinc-800 dark:text-white/90">5. Maintenance.</strong> Landlord
                   maintains habitability per Texas Property Code §92.052. Tenant reports
                   defects via the work-order portal.
                 </p>
                 <p>
-                  <strong className="text-white/90">6. Electronic signature.</strong>{" "}
+                  <strong className="text-zinc-800 dark:text-white/90">6. Electronic signature.</strong>{" "}
                   Clicking ACCEPT below constitutes a legally binding electronic signature
                   under the federal E-SIGN Act and Texas UETA.
                 </p>
@@ -144,7 +144,7 @@ export default async function OnboardPage({
             </details>
 
             {/* Acceptance form */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+            <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-100/60 dark:bg-white/[0.04] p-6 backdrop-blur-xl">
               <h2 className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-emerald-300/80">
                 Digital acceptance
               </h2>
@@ -153,7 +153,7 @@ export default async function OnboardPage({
           </>
         )}
 
-        <p className="mt-8 text-center text-[10px] text-white/30">
+        <p className="mt-8 text-center text-[10px] text-zinc-400 dark:text-white/30">
           PropMan OS · Secure tenant onboarding · Stripe & Supabase
         </p>
       </div>
@@ -171,13 +171,13 @@ function Row({
   emphasis?: boolean;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-2 last:border-0">
-      <dt className="text-[11px] font-semibold uppercase tracking-wider text-white/50">
+    <div className="flex items-baseline justify-between gap-4 border-b border-zinc-200 dark:border-white/5 pb-2 last:border-0">
+      <dt className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/50">
         {label}
       </dt>
       <dd
         className={`text-right ${
-          emphasis ? "text-base font-bold text-emerald-300" : "text-white/90"
+          emphasis ? "text-base font-bold text-emerald-300" : "text-zinc-800 dark:text-white/90"
         }`}
       >
         {value}

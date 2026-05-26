@@ -63,7 +63,7 @@ export default function RentLinkButton({ tenantId }: { tenantId: string }) {
                 /* no-op */
               }
             }}
-            className="rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-white/70 hover:bg-white/10"
+            className="rounded border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-2 py-1 text-[10px] text-zinc-600 dark:text-white/70 hover:bg-white/10"
           >
             {copied ? "Copied!" : "Copy"}
           </button>

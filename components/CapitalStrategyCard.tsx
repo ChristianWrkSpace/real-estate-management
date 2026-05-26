@@ -32,7 +32,7 @@ const REC_BADGE: Record<CapitalRecommendation, { label: string; cls: string; emo
   },
   hold: {
     label: "Hold",
-    cls: "border-white/15 bg-white/5 text-white/70",
+    cls: "border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/70",
     emoji: "⏸",
   },
   deleverage: {
@@ -80,7 +80,7 @@ export default function CapitalStrategyCard({ initial }: CapitalStrategyProps) {
             {isPending ? "Analyzing…" : "Run Analysis"}
           </button>
         </div>
-        <p className="mt-2 text-xs text-white/50">
+        <p className="mt-2 text-xs text-zinc-500 dark:text-white/50">
           Compute live LTV, equity, and refi math for the property.
         </p>
         {error && (
@@ -120,7 +120,7 @@ export default function CapitalStrategyCard({ initial }: CapitalStrategyProps) {
           </button>
         </div>
 
-        <p className="mb-3 text-sm font-semibold text-white/90">{analysis.headline}</p>
+        <p className="mb-3 text-sm font-semibold text-zinc-800 dark:text-white/90">{analysis.headline}</p>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <Micro
@@ -217,9 +217,9 @@ export default function CapitalStrategyCard({ initial }: CapitalStrategyProps) {
             <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-300/70">
               Ledger-Capital narrative
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-white/85">{analysis.narrative}</p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-800 dark:text-white/85">{analysis.narrative}</p>
             {analysis.narrative_model && (
-              <p className="mt-1 text-[10px] text-white/40">
+              <p className="mt-1 text-[10px] text-zinc-500 dark:text-white/40">
                 {analysis.narrative_model} · ${analysis.narrative_cost_usd.toFixed(4)}
               </p>
             )}
@@ -252,8 +252,8 @@ function Micro({
         ? "text-rose-200"
         : "text-indigo-100";
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 px-2.5 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">
+    <div className="rounded-lg border border-zinc-200 dark:border-white/10 bg-black/20 px-2.5 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/45">
         {label}
       </p>
       <p className={`mt-0.5 text-sm font-bold ${cls}`}>{value}</p>
@@ -277,16 +277,16 @@ function RefiBlock({
       ? "border-emerald-400/30 bg-emerald-500/10"
       : accent === "warning"
         ? "border-amber-400/30 bg-amber-500/10"
-        : "border-white/10 bg-white/5";
+        : "border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5";
   const head =
-    accent === "good" ? "text-emerald-200" : accent === "warning" ? "text-amber-200" : "text-white/85";
+    accent === "good" ? "text-emerald-200" : accent === "warning" ? "text-amber-200" : "text-zinc-800 dark:text-white/85";
   return (
     <div className={`rounded-lg border px-3 py-2 ${ring}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/45">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-white/45">
         {label}
       </p>
       <p className={`mt-0.5 text-base font-bold ${head}`}>{primary}</p>
-      <p className="text-[10px] text-white/50">{secondary}</p>
+      <p className="text-[10px] text-zinc-500 dark:text-white/50">{secondary}</p>
     </div>
   );
 }

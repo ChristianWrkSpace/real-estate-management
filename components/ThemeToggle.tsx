@@ -86,7 +86,7 @@ function Segment({
       onClick={onClick}
       className={`relative flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-300 active:scale-95 ${
         active
-          ? "bg-zinc-900 text-white shadow-md dark:bg-white dark:text-zinc-900"
+          ? "bg-zinc-900 text-zinc-900 dark:text-white shadow-md dark:bg-white dark:text-zinc-900"
           : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
       }`}
     >

@@ -51,7 +51,7 @@ export default function LeasePdfUpload({
             ? "border-indigo-400/60 bg-indigo-500/15 text-indigo-100"
             : url
               ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
-              : "border-white/15 bg-white/5 text-white/70 hover:border-white/30 hover:bg-white/10"
+              : "border-zinc-300 dark:border-white/15 bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/70 hover:border-white/30 hover:bg-white/10"
         } ${isPending ? "opacity-60" : ""}`}
       >
         <input
@@ -70,7 +70,7 @@ export default function LeasePdfUpload({
         ) : url ? (
           <span className="flex items-center gap-2">
             ✓ Lease on file
-            <span className="text-white/40">· drop to replace</span>
+            <span className="text-zinc-500 dark:text-white/40">· drop to replace</span>
           </span>
         ) : (
           <span>📎 Drop PDF or click</span>

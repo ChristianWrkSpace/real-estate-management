@@ -36,14 +36,14 @@ export default function SignUpPage() {
 
       <div className="w-full max-w-md relative z-10">
         {/* Card */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl shadow-2xl">
+        <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/[0.05] p-8 backdrop-blur-xl shadow-2xl">
           {/* Header */}
           <div className="mb-8 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4">
               <span className="text-xl">🏠</span>
             </div>
-            <h1 className="text-4xl font-bold text-white">Create Account</h1>
-            <p className="mt-3 text-sm text-white/60 font-medium">
+            <h1 className="text-4xl font-bold text-zinc-900 dark:text-white">Create Account</h1>
+            <p className="mt-3 text-sm text-zinc-600 dark:text-white/60 font-medium">
               Join PropMan OS
             </p>
           </div>
@@ -51,46 +51,46 @@ export default function SignUpPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-white/90">
+              <label className="block text-sm font-semibold text-zinc-800 dark:text-white/90">
                 Full Name
               </label>
               <input
                 type="text"
                 name="name"
                 required
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-3 text-zinc-900 dark:text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                 placeholder="John Doe"
                 disabled={isPending}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-white/90">
+              <label className="block text-sm font-semibold text-zinc-800 dark:text-white/90">
                 Email Address
               </label>
               <input
                 type="email"
                 name="email"
                 required
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-3 text-zinc-900 dark:text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                 placeholder="you@example.com"
                 disabled={isPending}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-white/90">
+              <label className="block text-sm font-semibold text-zinc-800 dark:text-white/90">
                 Password
               </label>
               <input
                 type="password"
                 name="password"
                 required
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                className="w-full rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-100 dark:bg-white/5 px-4 py-3 text-zinc-900 dark:text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                 placeholder="••••••••"
                 disabled={isPending}
               />
-              <p className="text-xs text-white/40">At least 6 characters</p>
+              <p className="text-xs text-zinc-500 dark:text-white/40">At least 6 characters</p>
             </div>
 
             {error && (
@@ -118,7 +118,7 @@ export default function SignUpPage() {
 
           {/* Login link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-zinc-600 dark:text-white/60">
               Already have an account?{" "}
               <a href="/login" className="text-blue-400 hover:text-blue-300 font-semibold transition">
                 Sign in here
@@ -128,7 +128,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-white/30">
+        <p className="mt-6 text-center text-xs text-zinc-400 dark:text-white/30">
           Secure • Supabase Auth • Model-agnostic AI
         </p>
       </div>

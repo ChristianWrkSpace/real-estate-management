@@ -4,8 +4,8 @@
 //
 // Tokens (see also CommandCenterShell):
 //   • Foundation:  bg-[#0E1012] page background
-//   • Surface:     bg-white/[0.03] backdrop-blur-2xl
-//   • Edge:        border-white/[0.06] hairline
+//   • Surface:     bg-zinc-50 dark:bg-white/[0.03] backdrop-blur-2xl
+//   • Edge:        border-zinc-200 dark:border-white/[0.06] hairline
 //   • Healing Blue: #6B8AD9
 //   • Safety Teal:  #5FBDB0
 //   • Intervention: amber-400
@@ -37,7 +37,7 @@ export function Glass({
     : "shadow-[0_12px_48px_-16px_rgba(0,0,0,0.8)]";
   return (
     <div
-      className={`rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-2xl ring-1 ${ring} ${shadow} ${className}`}
+      className={`rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03] backdrop-blur-2xl ring-1 ${ring} ${shadow} ${className}`}
     >
       {children}
     </div>
@@ -62,7 +62,7 @@ export function PanelHeader({
           {emoji && <span className="mr-1.5">{emoji}</span>}
           {title}
         </h2>
-        {sub && <p className="text-[11px] text-white/40 mt-0.5">{sub}</p>}
+        {sub && <p className="text-[11px] text-zinc-500 dark:text-white/40 mt-0.5">{sub}</p>}
       </div>
       {right}
     </div>
@@ -109,7 +109,7 @@ export function CountChip({
       : tone === "blue"
         ? "bg-[#6B8AD9]/10 text-[#A6B8E7] ring-[#6B8AD9]/20"
         : tone === "neutral"
-          ? "bg-white/5 text-white/60 ring-white/10"
+          ? "bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-white/60 ring-white/10"
           : "bg-[#5FBDB0]/10 text-[#A8DCD3] ring-[#5FBDB0]/20";
   return (
     <span

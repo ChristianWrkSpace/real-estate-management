@@ -38,7 +38,7 @@ export function NoAccessPanel({
   return (
     <div className="p-4 md:p-8 max-w-2xl">
       <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8">
-        <h1 className="text-xl font-bold text-white">Access restricted</h1>
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-white">Access restricted</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2 leading-relaxed">
           This page is for{" "}
           <span className="text-zinc-800 dark:text-zinc-200">{needs.join(" / ")}</span> only. You're
