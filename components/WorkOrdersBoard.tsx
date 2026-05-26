@@ -6,6 +6,7 @@ import {
   createWorkOrder,
   resolveWorkOrder,
 } from "@/app/actions/ops";
+import DispatchSuggestionPanel from "@/components/DispatchSuggestionPanel";
 
 export type WorkOrder = {
   id: string;
@@ -232,6 +233,12 @@ function OrderCard({
           >
             Mark as Resolved
           </button>
+
+          {/* Argus-Dispatch — auto-suggest a vendor + cost estimate */}
+          <DispatchSuggestionPanel
+            workOrderId={order.id}
+            isAlreadyAssigned={!!order.vendor_id}
+          />
         </div>
       )}
 
