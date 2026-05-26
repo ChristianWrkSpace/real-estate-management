@@ -1,26 +1,28 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 — single import generates base + components + utilities.
+   The legacy v3 directives (@tailwind base/components/utilities) are no-ops
+   in v4 and were the root cause of the missing utility classes (grid,
+   bg-zinc-*, backdrop-blur-*, etc.) on production. */
+@import "tailwindcss";
 
+/* Force a permanent dark surface regardless of OS color-scheme preference.
+   We never render a light mode — this prevents prefers-color-scheme media
+   queries from flashing white before the body classes apply. */
 :root {
-  --background: 0 0% 0%;
-  --foreground: 0 0% 98%;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.6%;
-  }
+  color-scheme: dark;
+  --background: #09090b;
+  --foreground: #f4f4f5;
 }
 
 body {
-  color: hsl(var(--foreground));
-  background: hsl(var(--background));
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
 }
 
-/* Glassmorphism utility */
+/* Optional convenience utility for legacy components — current pattern is to
+   compose Tailwind classes directly. */
 .glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);

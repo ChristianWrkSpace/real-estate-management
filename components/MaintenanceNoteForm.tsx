@@ -55,9 +55,9 @@ export default function MaintenanceNoteForm({
   };
 
   return (
-    <div className="h-full rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition hover:border-zinc-700">
+    <div className="h-full bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
       <div className="mb-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-300/80">
+        <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
           ⚒ Maintenance Note
         </p>
         <p className="mt-1 text-xs text-zinc-500">
@@ -145,12 +145,12 @@ export default function MaintenanceNoteForm({
 }
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 transition focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-60";
+  "w-full bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-lg px-3 py-2 text-sm placeholder-zinc-600 transition focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
         {label}
       </span>
       {children}

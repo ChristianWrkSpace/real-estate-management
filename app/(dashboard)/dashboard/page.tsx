@@ -26,6 +26,14 @@ const QUICK_ACTIONS: { href: string; label: string; icon: string; accent: Accent
   { href: "/finance", label: "Full P&L", icon: "📈", accent: "indigo" },
 ];
 
+const ACCENT_TEXT: Record<Accent, string> = {
+  emerald: "text-emerald-400",
+  rose: "text-rose-400",
+  amber: "text-amber-400",
+  indigo: "text-indigo-400",
+  blue: "text-blue-400",
+};
+
 const fmtUsd = (n: number | null, frac = 0) =>
   n == null
     ? "—"
@@ -35,22 +43,6 @@ const fmtUsd = (n: number | null, frac = 0) =>
         maximumFractionDigits: frac,
       });
 
-const ACCENT_TEXT: Record<Accent, string> = {
-  emerald: "text-emerald-400",
-  rose: "text-rose-400",
-  amber: "text-amber-400",
-  indigo: "text-indigo-400",
-  blue: "text-blue-400",
-};
-
-const ACTION_GLOW: Record<Accent, string> = {
-  emerald: "hover:shadow-[0_0_28px_rgba(16,185,129,0.12)]",
-  rose: "hover:shadow-[0_0_28px_rgba(244,63,94,0.14)]",
-  amber: "hover:shadow-[0_0_28px_rgba(245,158,11,0.14)]",
-  indigo: "hover:shadow-[0_0_28px_rgba(99,102,241,0.12)]",
-  blue: "hover:shadow-[0_0_28px_rgba(59,130,246,0.12)]",
-};
-
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const supabase = await createServerSupabaseClient();
@@ -59,10 +51,7 @@ export default async function DashboardPage() {
   const property = properties?.[0];
 
   const [unitsRes, workOrdersRes, txRes, vendorsRes, unitsFullRes] = await Promise.all([
-    supabase
-      .from("units")
-      .select("id, status")
-      .eq("property_id", property?.id || ""),
+    supabase.from("units").select("id, status").eq("property_id", property?.id || ""),
     supabase
       .from("work_orders")
       .select("id, status, priority")
@@ -117,25 +106,27 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="min-h-full bg-zinc-950">
-      <div className="mx-auto max-w-7xl space-y-8 p-6">
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <header className="flex items-baseline justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">Dashboard</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">
+              Dashboard
+            </h1>
             <p className="mt-1 text-sm text-zinc-400">
               {property?.name ?? "Property"} · Welcome, {user?.name}
             </p>
           </div>
           {initialReport?.asOf && (
-            <span className="rounded-md border border-zinc-800 bg-zinc-900/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+            <span className="rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-zinc-500">
               audit · {initialReport.asOf}
             </span>
           )}
         </header>
 
-        {/* KPI 4-card row */}
-        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 4-Card KPI Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             label="Occupancy"
             metric={`${occupiedUnits}/${totalUnits}`}
@@ -164,7 +155,7 @@ export default async function DashboardPage() {
             }
             accent="emerald"
           />
-        </section>
+        </div>
 
         {/* Intelligence Layer */}
         <section className="space-y-3">
@@ -182,15 +173,18 @@ export default async function DashboardPage() {
           />
         </section>
 
-        {/* Operations: Maintenance (2 cols) + Quick Actions (1 col) */}
-        <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <MaintenanceNoteForm
-              units={unitsFullRes.data ?? []}
-              vendors={vendorsRes.data ?? []}
-            />
+        {/* Operations Row: Maintenance (2 cols) + Quick Actions (1 col) */}
+        <section className="space-y-3">
+          <SectionLabel>Operations</SectionLabel>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <MaintenanceNoteForm
+                units={unitsFullRes.data ?? []}
+                vendors={vendorsRes.data ?? []}
+              />
+            </div>
+            <QuickActionsPanel />
           </div>
-          <QuickActionsPanel />
         </section>
 
         {/* Mortgage tracker */}
@@ -205,7 +199,7 @@ export default async function DashboardPage() {
             <SectionLabel>Per-Unit P&amp;L Matrix</SectionLabel>
             <a
               href="/finance"
-              className="text-[11px] text-zinc-500 transition hover:text-zinc-300"
+              className="text-xs text-zinc-500 hover:text-zinc-300"
             >
               Full ledger →
             </a>
@@ -217,8 +211,8 @@ export default async function DashboardPage() {
         {property && (
           <section className="space-y-3">
             <SectionLabel>Property Snapshot</SectionLabel>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-md transition hover:border-zinc-700">
-              <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+            <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <Detail label="Address" value={property.name} />
                 <Detail label="Units" value={`${property.units_count} total`} />
                 <Detail label="Value" value={fmtUsd(currentValue)} mono />
@@ -251,7 +245,7 @@ export default async function DashboardPage() {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+    <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-500">
       {children}
     </h2>
   );
@@ -269,7 +263,7 @@ function StatCard({
   accent: Accent;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition hover:border-zinc-700">
+    <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
       <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
         {label}
       </p>
@@ -285,17 +279,17 @@ function StatCard({
 
 function QuickActionsPanel() {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition hover:border-zinc-700">
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+    <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
+      <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">
         ⚡ Quick Actions
       </p>
       <p className="mt-1 text-xs text-zinc-500">Jump to any module</p>
-      <div className="mt-4 grid grid-cols-1 gap-2.5">
+      <div className="mt-4 space-y-2.5">
         {QUICK_ACTIONS.map((q) => (
           <a
             key={q.href}
             href={q.href}
-            className={`group flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2.5 transition hover:border-zinc-700 hover:bg-zinc-900/80 ${ACTION_GLOW[q.accent]}`}
+            className="group flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 transition hover:border-zinc-700 hover:bg-zinc-900"
           >
             <div className="flex items-center gap-2.5">
               <span className="text-base">{q.icon}</span>
@@ -328,7 +322,7 @@ function Detail({
 }) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">{label}</p>
       <p
         className={`mt-1 text-sm font-semibold tracking-tight ${mono ? "font-mono" : ""} ${
           accent ? "text-emerald-400" : "text-zinc-100"
