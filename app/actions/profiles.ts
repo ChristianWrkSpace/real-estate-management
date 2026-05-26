@@ -1,5 +1,6 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createAdminClient, createServerSupabaseClient } from "@/lib/supabase-server";
 
@@ -261,4 +262,181 @@ export async function updateTenantProfile(
   revalidatePath("/dashboard");
 
   return { success: true, log_id: logId };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Create tenant (+ optional lease + onboarding token)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type CreateTenantInput = {
+  firstName: string;
+  lastName: string;
+  email?: string | null;
+  phone?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  notes?: string | null;
+  /** Status: 'prospect' if no lease yet, 'active' if assigning a unit immediately. */
+  initialStatus?: "active" | "prospect";
+
+  // Optional lease — set unitId to assign immediately
+  unitId?: string | null;
+  monthlyRent?: number | null;
+  securityDeposit?: number | null;
+  startDate?: string | null;       // YYYY-MM-DD
+  endDate?: string | null;
+  leaseType?: "fixed" | "month-to-month";
+  /** Mint a one-time onboarding URL and return it (does not send any email). */
+  generateOnboardingToken?: boolean;
+};
+
+export type CreateTenantResult = {
+  success: boolean;
+  error?: string;
+  tenant_id?: string;
+  lease_id?: string;
+  onboarding_url?: string;
+  unit_flipped_occupied?: boolean;
+};
+
+export async function createTenant(input: CreateTenantInput): Promise<CreateTenantResult> {
+  const auth = await requireOwnerOrManager();
+  if (!auth.ok) return { success: false, error: auth.error };
+
+  const firstName = input.firstName?.trim();
+  const lastName = input.lastName?.trim();
+  if (!firstName || !lastName) {
+    return { success: false, error: "First and last name are required" };
+  }
+  if (!input.email?.trim() && !input.phone?.trim()) {
+    return { success: false, error: "Email or phone required (need a contact channel)" };
+  }
+
+  const admin = createAdminClient();
+
+  // Single-property setup: locate the property row.
+  const { data: property } = await admin
+    .from("properties")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+  if (!property) return { success: false, error: "No property row to attach tenant to" };
+
+  // ── 1. Insert tenant ───────────────────────────────────────────────────
+  const status =
+    input.initialStatus ?? (input.unitId ? "active" : "prospect");
+
+  const { data: tenant, error: tErr } = await admin
+    .from("tenants")
+    .insert({
+      property_id: property.id,
+      first_name: firstName,
+      last_name: lastName,
+      email: input.email?.trim() || null,
+      phone: input.phone?.trim() || null,
+      emergency_contact_name: input.emergencyContactName?.trim() || null,
+      emergency_contact_phone: input.emergencyContactPhone?.trim() || null,
+      status,
+      notes: input.notes?.trim() || null,
+    })
+    .select("id")
+    .single();
+  if (tErr || !tenant) {
+    return { success: false, error: `Tenant insert failed: ${tErr?.message ?? "no row"}` };
+  }
+
+  let leaseId: string | undefined;
+  let unitFlipped = false;
+  let onboardingUrl: string | undefined;
+
+  // ── 2. Optional lease ──────────────────────────────────────────────────
+  if (input.unitId) {
+    const monthlyRent = input.monthlyRent;
+    if (monthlyRent == null || !Number.isFinite(monthlyRent) || monthlyRent < 0) {
+      return {
+        success: false,
+        error: "monthlyRent is required when assigning a unit",
+        tenant_id: tenant.id,
+      };
+    }
+    const startDate = input.startDate || new Date().toISOString().split("T")[0];
+    const onboardingToken = input.generateOnboardingToken
+      ? randomBytes(24).toString("base64url")
+      : null;
+
+    const { data: lease, error: lErr } = await admin
+      .from("leases")
+      .insert({
+        unit_id: input.unitId,
+        tenant_id: tenant.id,
+        start_date: startDate,
+        end_date: input.endDate || null,
+        monthly_rent: monthlyRent,
+        security_deposit: input.securityDeposit ?? null,
+        lease_type: input.leaseType ?? "fixed",
+        status: "active",
+        onboarding_token: onboardingToken,
+        onboarding_sent_at: onboardingToken ? new Date().toISOString() : null,
+      })
+      .select("id")
+      .single();
+    if (lErr) {
+      return {
+        success: false,
+        error: `Lease insert failed: ${lErr.message}`,
+        tenant_id: tenant.id,
+      };
+    }
+    leaseId = lease.id;
+
+    // ── 3. Flip unit → occupied
+    const { error: unitErr } = await admin
+      .from("units")
+      .update({ status: "occupied" })
+      .eq("id", input.unitId);
+    if (!unitErr) unitFlipped = true;
+
+    if (onboardingToken) {
+      const origin =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+      onboardingUrl = `${origin}/onboard/${onboardingToken}`;
+    }
+  }
+
+  // ── 4. Audit log ───────────────────────────────────────────────────────
+  try {
+    await admin.from("ai_logs").insert({
+      agent_name: "profile-tenant",
+      task_description: "create_tenant",
+      model_used: "deterministic",
+      token_cost: 0,
+      status: "succeeded",
+      output_data: {
+        tenant_id: tenant.id,
+        tenant_name: `${firstName} ${lastName}`,
+        created_by: auth.profile.name,
+        created_at: new Date().toISOString(),
+        initial_status: status,
+        lease_id: leaseId ?? null,
+        unit_id: input.unitId ?? null,
+        unit_flipped_occupied: unitFlipped,
+        onboarding_token_minted: !!onboardingUrl,
+      } as Record<string, unknown>,
+    });
+  } catch {
+    /* best-effort */
+  }
+
+  revalidatePath("/tenants");
+  revalidatePath("/units");
+  revalidatePath("/dashboard");
+
+  return {
+    success: true,
+    tenant_id: tenant.id,
+    lease_id: leaseId,
+    onboarding_url: onboardingUrl,
+    unit_flipped_occupied: unitFlipped,
+  };
 }

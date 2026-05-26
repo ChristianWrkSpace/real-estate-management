@@ -3,6 +3,7 @@ import { getLeaseDocumentMap } from "@/app/actions/leases";
 import { getDelinquencyMap } from "@/app/actions/legal";
 import TenantsTable, { type TenantRow } from "@/components/TenantsTable";
 import type { UnitOption } from "@/components/TenantEditDrawer";
+import AddTenantModal, { type AddTenantUnit } from "@/components/AddTenantModal";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function TenantsPage() {
 
   const { data: unitsData } = await supabase
     .from("units")
-    .select("id, unit_number, status")
+    .select("id, unit_number, status, monthly_rent")
     .eq("property_id", property?.id || "")
     .order("unit_number");
 
@@ -72,6 +73,13 @@ export default async function TenantsPage() {
     status: u.status,
   }));
 
+  const addTenantUnitOptions: AddTenantUnit[] = (unitsData ?? []).map((u) => ({
+    id: u.id,
+    unit_number: u.unit_number,
+    status: u.status,
+    monthly_rent: u.monthly_rent != null ? Number(u.monthly_rent) : null,
+  }));
+
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -82,12 +90,7 @@ export default async function TenantsPage() {
               {property?.name ?? "Property"} · click any name to edit, generate links, reassign units
             </p>
           </div>
-          <a
-            href="#"
-            className="rounded-lg bg-gradient-to-r from-emerald-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/15 transition hover:from-emerald-600 hover:to-blue-700"
-          >
-            + Add Tenant
-          </a>
+          <AddTenantModal units={addTenantUnitOptions} />
         </header>
 
         <TenantsTable tenants={tenantRows} units={unitOptions} />
