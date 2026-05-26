@@ -8,6 +8,7 @@ import {
   type ContractTemplate,
   type TenantDocument,
 } from "@/app/actions/contracts";
+import { createSigningRequest } from "@/app/actions/signing";
 import CopyLinkPill from "@/components/CopyLinkPill";
 
 export default function ContractLibrary({
@@ -22,11 +23,18 @@ export default function ContractLibrary({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyKind, setBusyKind] = useState<string | null>(null);
+  const [sendingKind, setSendingKind] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [justGenerated, setJustGenerated] = useState<{
     kind: string;
     url: string;
     unfilled: string[];
+  } | null>(null);
+  const [justSent, setJustSent] = useState<{
+    kind: string;
+    url: string;
+    required: string[];
+    prefilledCount: number;
   } | null>(null);
 
   useEffect(() => {
@@ -53,6 +61,7 @@ export default function ContractLibrary({
     setError(null);
     setBusyKind(kind);
     setJustGenerated(null);
+    setJustSent(null);
     startTransition(async () => {
       const r = await generateContractForTenant({ tenantId, templateKind: kind });
       if (r.success && r.download_url) {
@@ -68,6 +77,27 @@ export default function ContractLibrary({
         setError(r.error ?? "Generation failed");
       }
       setBusyKind(null);
+    });
+  };
+
+  const sendForSignature = (kind: string) => {
+    setError(null);
+    setSendingKind(kind);
+    setJustGenerated(null);
+    setJustSent(null);
+    startTransition(async () => {
+      const r = await createSigningRequest({ tenantId, templateKind: kind });
+      if (r.success && r.url) {
+        setJustSent({
+          kind,
+          url: r.url,
+          required: r.required_fields ?? [],
+          prefilledCount: r.prefilled_count ?? 0,
+        });
+      } else {
+        setError(r.error ?? "Could not create signing link");
+      }
+      setSendingKind(null);
     });
   };
 
@@ -101,6 +131,7 @@ export default function ContractLibrary({
                 t.kind === "lease_full" || t.kind === "lease_short";
               const blockedByMissingLease = isLeaseLike && !tenantHasActiveLease;
               const isBusy = busyKind === t.kind;
+              const isSending = sendingKind === t.kind;
               return (
                 <div
                   key={t.id}
@@ -125,14 +156,24 @@ export default function ContractLibrary({
                         </p>
                       )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => generate(t.kind)}
-                      disabled={isBusy || blockedByMissingLease}
-                      className="shrink-0 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {isBusy ? "Generating…" : "Generate"}
-                    </button>
+                    <div className="flex shrink-0 flex-col gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => generate(t.kind)}
+                        disabled={isBusy || isSending || blockedByMissingLease}
+                        className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {isBusy ? "Generating…" : "Generate"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => sendForSignature(t.kind)}
+                        disabled={isBusy || isSending || blockedByMissingLease}
+                        className="rounded-md border border-blue-500/40 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-200 transition hover:border-blue-400/60 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {isSending ? "Sending…" : "Send for Signature"}
+                      </button>
+                    </div>
                   </div>
                   {blockedByMissingLease && (
                     <p className="mt-2 text-[10px] text-amber-300/80">
@@ -168,6 +209,35 @@ export default function ContractLibrary({
             {justGenerated.unfilled.length > 0 && (
               <p className="mt-2 font-mono text-[10px] text-amber-300/80">
                 Still to fill by hand: {justGenerated.unfilled.join(", ")}
+              </p>
+            )}
+          </div>
+        )}
+
+        {justSent && (
+          <div className="mt-3 rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 shadow-[0_0_28px_rgba(59,130,246,0.15)]">
+            <p className="text-sm font-semibold tracking-tight text-blue-100">
+              ✓ Signing link ready — {justSent.kind.replace(/_/g, " ")}
+            </p>
+            <p className="mt-1 text-[11px] text-blue-200/80">
+              {justSent.prefilledCount} field
+              {justSent.prefilledCount === 1 ? "" : "s"} pre-filled from this
+              tenant&apos;s profile. Link expires in 30 days.
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <a
+                href={justSent.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md border border-blue-500/40 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-blue-200 hover:bg-zinc-900"
+              >
+                ↗ Open signing page
+              </a>
+              <CopyLinkPill url={justSent.url} label="Copy signing link" />
+            </div>
+            {justSent.required.length > 0 && (
+              <p className="mt-2 font-mono text-[10px] text-amber-300/80">
+                Tenant will be asked to fill: {justSent.required.join(", ")}
               </p>
             )}
           </div>
