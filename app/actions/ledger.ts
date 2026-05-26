@@ -22,6 +22,12 @@ export type UnitPnlRow = {
   income_ytd: number;
   expenses_ytd: number;
   net_cash_flow_ytd: number;
+  /**
+   * Annualized net unit yield as a percent of annualized scheduled rent.
+   * = (annualized NOI / (scheduled_rent × 12)) × 100.
+   * Null when scheduled rent is unknown or zero.
+   */
+  net_yield_pct: number | null;
   last_rent_payment_at: string | null;
   last_expense_at: string | null;
   open_work_orders: number;
@@ -166,11 +172,18 @@ export async function getPerUnitPnl(): Promise<PerUnitPnl | null> {
     openWoByUnit.set(w.unit_id, (openWoByUnit.get(w.unit_id) ?? 0) + 1);
   }
 
+  // Annualize the YTD net cash flow using the fraction of the year elapsed.
+  const yearStartMs = new Date(startOfYear).getTime();
+  const elapsedMs = Math.max(1, Date.now() - yearStartMs);
+  const yearFraction = Math.min(1, elapsedMs / (365 * 24 * 60 * 60 * 1000));
+  const annualScale = 1 / Math.max(yearFraction, 1 / 12);
+
   const units: UnitPnlRow[] = unitRows.map((u) => {
     const lease = leaseByUnit.get(u.id);
     const scheduledRent = lease ? Number(lease.monthly_rent) : null;
     const incomeYtd = incomeByUnit.get(u.id) ?? 0;
     const expensesYtd = expensesByUnit.get(u.id) ?? 0;
+    const netCashFlowYtd = incomeYtd - expensesYtd;
     const paidThisMonth = currentMonthRentPaidByUnit.get(u.id) ?? 0;
 
     let rentStatus: UnitPnlRow["rent_status"];
@@ -184,6 +197,13 @@ export async function getPerUnitPnl(): Promise<PerUnitPnl | null> {
       rentStatus = "due";
     }
 
+    const annualizedNoi = netCashFlowYtd * annualScale;
+    const annualScheduled = scheduledRent != null ? scheduledRent * 12 : null;
+    const netYieldPct =
+      annualScheduled && annualScheduled > 0
+        ? (annualizedNoi / annualScheduled) * 100
+        : null;
+
     return {
       unit_id: u.id,
       unit_number: u.unit_number,
@@ -196,7 +216,8 @@ export async function getPerUnitPnl(): Promise<PerUnitPnl | null> {
       rent_status: rentStatus,
       income_ytd: incomeYtd,
       expenses_ytd: expensesYtd,
-      net_cash_flow_ytd: incomeYtd - expensesYtd,
+      net_cash_flow_ytd: netCashFlowYtd,
+      net_yield_pct: netYieldPct,
       last_rent_payment_at: lastIncomeByUnit.get(u.id) ?? null,
       last_expense_at: lastExpenseByUnit.get(u.id) ?? null,
       open_work_orders: openWoByUnit.get(u.id) ?? 0,

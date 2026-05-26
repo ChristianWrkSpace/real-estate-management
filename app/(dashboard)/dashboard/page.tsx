@@ -4,8 +4,11 @@ import { getLatestAuditReport } from "@/app/actions/agents";
 import { getLatestCadSync } from "@/app/actions/tax";
 import { getLatestCapitalAnalysis } from "@/app/actions/capital";
 import { getLatestYieldAnalysis } from "@/app/actions/yield";
+import { getPerUnitPnl, getMortgageBreakdown } from "@/app/actions/ledger";
 import GodModeWidget from "@/components/GodModeWidget";
 import MaintenanceNoteForm from "@/components/MaintenanceNoteForm";
+import UnitLedgerGrid from "@/components/UnitLedgerGrid";
+import MortgageEquityTracker from "@/components/MortgageEquityTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +101,10 @@ export default async function DashboardPage() {
   }));
   const capitalAnalysis = await getLatestCapitalAnalysis().catch(() => null);
   const yieldAnalysis = await getLatestYieldAnalysis().catch(() => null);
+  const [unitPnl, mortgageBreakdown] = await Promise.all([
+    getPerUnitPnl().catch(() => null),
+    getMortgageBreakdown().catch(() => null),
+  ]);
 
   return (
     <div className="p-8">
@@ -182,6 +189,30 @@ export default async function DashboardPage() {
           vendors={vendorsRes.data ?? []}
         />
       </div>
+
+      {/* Mortgage + Equity live tracker */}
+      <section className="mt-8">
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+          Mortgage & Equity (live amortization)
+        </h2>
+        <MortgageEquityTracker initial={mortgageBreakdown} />
+      </section>
+
+      {/* Per-Unit P&L 4-column matrix */}
+      <section className="mt-8">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+            Per-Unit P&amp;L Matrix
+          </h2>
+          <a
+            href="/finance"
+            className="text-[11px] text-white/40 hover:text-white/70"
+          >
+            Full ledger →
+          </a>
+        </div>
+        <UnitLedgerGrid data={unitPnl} />
+      </section>
 
       {/* Property Info */}
       {property && (

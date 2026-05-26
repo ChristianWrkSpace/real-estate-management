@@ -100,6 +100,22 @@ function UnitColumn({ u }: { u: UnitPnlRow }) {
           accent={cashFlowPositive ? "emerald" : "rose"}
           big
         />
+        <Stat
+          label="Net unit yield"
+          value={
+            u.net_yield_pct == null
+              ? "—"
+              : `${u.net_yield_pct >= 0 ? "+" : ""}${u.net_yield_pct.toFixed(1)}%`
+          }
+          accent={
+            u.net_yield_pct == null
+              ? "neutral"
+              : u.net_yield_pct >= 0
+                ? "emerald"
+                : "rose"
+          }
+          suffix={u.net_yield_pct == null ? undefined : "annualized"}
+        />
 
         {u.open_work_orders > 0 && (
           <p className="mt-3 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-200">
