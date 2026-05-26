@@ -440,3 +440,124 @@ export async function createTenant(input: CreateTenantInput): Promise<CreateTena
     unit_flipped_occupied: unitFlipped,
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Activate prospect → tenant (create first lease, flip unit, update status)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ActivateProspectInput = {
+  tenantId: string;
+  unitId: string;
+  monthlyRent: number;
+  securityDeposit?: number | null;
+  startDate: string;   // YYYY-MM-DD
+  endDate?: string | null;
+  leaseType?: "fixed" | "month-to-month";
+  generateOnboardingToken?: boolean;
+};
+
+export type ActivateProspectResult = {
+  success: boolean;
+  error?: string;
+  lease_id?: string;
+  onboarding_url?: string;
+};
+
+export async function activateProspectLease(
+  input: ActivateProspectInput
+): Promise<ActivateProspectResult> {
+  const auth = await requireOwnerOrManager();
+  if (!auth.ok) return { success: false, error: auth.error };
+
+  if (!input.tenantId) return { success: false, error: "tenantId required" };
+  if (!input.unitId) return { success: false, error: "Pick a unit" };
+  if (!Number.isFinite(input.monthlyRent) || input.monthlyRent < 0) {
+    return { success: false, error: "Monthly rent must be a positive number" };
+  }
+  if (!input.startDate) return { success: false, error: "Lease start date required" };
+
+  const admin = createAdminClient();
+
+  const { data: tenant } = await admin
+    .from("tenants")
+    .select("id, first_name, last_name, status")
+    .eq("id", input.tenantId)
+    .maybeSingle();
+  if (!tenant) return { success: false, error: "Tenant not found" };
+
+  const { data: existing } = await admin
+    .from("leases")
+    .select("id")
+    .eq("tenant_id", input.tenantId)
+    .eq("status", "active")
+    .maybeSingle();
+  if (existing) {
+    return {
+      success: false,
+      error: "Tenant already has an active lease — reassign from the lease card instead.",
+    };
+  }
+
+  const onboardingToken = input.generateOnboardingToken
+    ? randomBytes(24).toString("base64url")
+    : null;
+
+  const { data: lease, error: lErr } = await admin
+    .from("leases")
+    .insert({
+      unit_id: input.unitId,
+      tenant_id: input.tenantId,
+      start_date: input.startDate,
+      end_date: input.endDate || null,
+      monthly_rent: input.monthlyRent,
+      security_deposit: input.securityDeposit ?? null,
+      lease_type: input.leaseType ?? "fixed",
+      status: "active",
+      onboarding_token: onboardingToken,
+      onboarding_sent_at: onboardingToken ? new Date().toISOString() : null,
+    })
+    .select("id")
+    .single();
+  if (lErr || !lease) {
+    return { success: false, error: `Lease insert failed: ${lErr?.message ?? "no row"}` };
+  }
+
+  await admin.from("units").update({ status: "occupied" }).eq("id", input.unitId);
+  await admin.from("tenants").update({ status: "active" }).eq("id", input.tenantId);
+
+  let onboardingUrl: string | undefined;
+  if (onboardingToken) {
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    onboardingUrl = `${origin}/onboard/${onboardingToken}`;
+  }
+
+  try {
+    await admin.from("ai_logs").insert({
+      agent_name: "profile-tenant",
+      task_description: "activate_prospect_lease",
+      model_used: "deterministic",
+      token_cost: 0,
+      status: "succeeded",
+      output_data: {
+        tenant_id: tenant.id,
+        tenant_name: `${tenant.first_name} ${tenant.last_name}`,
+        lease_id: lease.id,
+        unit_id: input.unitId,
+        monthly_rent: input.monthlyRent,
+        start_date: input.startDate,
+        onboarding_token_minted: !!onboardingUrl,
+        activated_by: auth.profile.name,
+      } as Record<string, unknown>,
+    });
+  } catch {
+    /* best-effort */
+  }
+
+  revalidatePath("/tenants");
+  revalidatePath("/units");
+  revalidatePath("/dashboard");
+
+  return { success: true, lease_id: lease.id, onboarding_url: onboardingUrl };
+}

@@ -24,6 +24,10 @@ const ADMIN: Item[] = [
   { href: "/approvals", label: "Approvals", hint: "HITL queue", icon: <IconCheck /> },
 ];
 
+const RESOURCES: Item[] = [
+  { href: "/help", label: "How to use", hint: "Operator guide · walkthrough", icon: <IconHelp /> },
+];
+
 export default function MoreSheet({
   open,
   onClose,
@@ -120,6 +124,7 @@ export default function MoreSheet({
         <SectionGroup label="Operations" items={OPERATIONS} isActive={isActive} onNavigate={onClose} />
         <SectionGroup label="Management" items={MANAGEMENT} isActive={isActive} onNavigate={onClose} />
         <SectionGroup label="Admin" items={ADMIN} isActive={isActive} onNavigate={onClose} />
+        <SectionGroup label="Resources" items={RESOURCES} isActive={isActive} onNavigate={onClose} />
       </div>
     </div>
   );
@@ -255,6 +260,15 @@ function IconChevron() {
   return (
     <svg {...I} width={14} height={14}>
       <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+}
+function IconHelp() {
+  return (
+    <svg {...I}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 1-1 1.7" />
+      <path d="M12 17h.01" />
     </svg>
   );
 }
