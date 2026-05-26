@@ -107,12 +107,15 @@ export default function LoginPage() {
           {/* Demo hint */}
           <div className="mt-8 rounded-lg bg-white/[0.02] border border-white/5 p-4">
             <p className="text-center text-xs font-medium text-white/60 mb-2">
-              📝 Demo Credentials
+              📝 Admin Credentials
             </p>
             <div className="space-y-1 text-xs text-white/40 font-mono text-center">
-              <p>Email: <span className="text-white/60">demo@example.com</span></p>
-              <p>Password: <span className="text-white/60">demo1234</span></p>
+              <p>Email: <span className="text-white/60">admin@propman.com</span></p>
+              <p>Password: <span className="text-white/60">AdminTest123!</span></p>
             </div>
+            <p className="mt-3 text-[10px] text-center text-white/30">
+              Provisioned by <code>scripts/force-local-user.ts</code>
+            </p>
           </div>
 
           {/* Signup link */}
