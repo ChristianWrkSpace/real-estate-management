@@ -119,7 +119,7 @@ export default function ContractLibrary({
         )}
 
         {!loading && templates.length === 0 && (
-          <p className="mt-3 text-xs text-amber-300">
+          <p className="mt-3 text-xs text-amber-700 dark:text-amber-300">
             No templates registered. Run <code>npx tsx scripts/upload-templates.ts</code>.
           </p>
         )}
@@ -161,7 +161,7 @@ export default function ContractLibrary({
                         type="button"
                         onClick={() => generate(t.kind)}
                         disabled={isBusy || isSending || blockedByMissingLease}
-                        className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="rounded-md border border-emerald-500/50 bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 transition hover:border-emerald-500/70 hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-40 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:border-emerald-400/60 dark:hover:bg-emerald-500/20"
                       >
                         {isBusy ? "Generating…" : "Generate"}
                       </button>
@@ -169,14 +169,14 @@ export default function ContractLibrary({
                         type="button"
                         onClick={() => sendForSignature(t.kind)}
                         disabled={isBusy || isSending || blockedByMissingLease}
-                        className="rounded-md border border-blue-500/40 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-200 transition hover:border-blue-400/60 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="rounded-md border border-blue-500/50 bg-blue-500/15 px-2.5 py-1 text-[11px] font-semibold text-blue-800 transition hover:border-blue-500/70 hover:bg-blue-500/25 disabled:cursor-not-allowed disabled:opacity-40 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-200 dark:hover:border-blue-400/60 dark:hover:bg-blue-500/20"
                       >
                         {isSending ? "Sending…" : "Send for Signature"}
                       </button>
                     </div>
                   </div>
                   {blockedByMissingLease && (
-                    <p className="mt-2 text-[10px] text-amber-300/80">
+                    <p className="mt-2 text-[10px] font-medium text-amber-700 dark:text-amber-300/80">
                       Needs an active lease to fill rent / unit fields. Create
                       one for this tenant first.
                     </p>
@@ -188,11 +188,11 @@ export default function ContractLibrary({
         )}
 
         {justGenerated && (
-          <div className="mt-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3 shadow-[0_0_28px_rgba(16,185,129,0.15)]">
-            <p className="text-sm font-semibold tracking-tight text-emerald-100">
+          <div className="mt-3 rounded-lg border border-emerald-500/50 bg-emerald-500/15 p-3 shadow-[0_0_28px_rgba(16,185,129,0.15)] dark:border-emerald-500/40 dark:bg-emerald-500/10">
+            <p className="text-sm font-semibold tracking-tight text-emerald-900 dark:text-emerald-100">
               ✓ Generated {justGenerated.kind.replace(/_/g, " ")}
             </p>
-            <p className="mt-1 text-[11px] text-emerald-200/80">
+            <p className="mt-1 text-[11px] text-emerald-800 dark:text-emerald-200/80">
               Saved to this tenant&apos;s profile and to the contracts bucket.
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -200,14 +200,14 @@ export default function ContractLibrary({
                 href={justGenerated.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-emerald-500/40 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 hover:bg-zinc-900"
+                className="rounded-md border border-emerald-500/50 bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-800 hover:bg-emerald-50 dark:border-emerald-500/40 dark:bg-zinc-950 dark:text-emerald-200 dark:hover:bg-zinc-900"
               >
                 ⬇ Download .docx
               </a>
               <CopyLinkPill url={justGenerated.url} label="Copy share link" />
             </div>
             {justGenerated.unfilled.length > 0 && (
-              <p className="mt-2 font-mono text-[10px] text-amber-300/80">
+              <p className="mt-2 font-mono text-[10px] font-medium text-amber-700 dark:text-amber-300/80">
                 Still to fill by hand: {justGenerated.unfilled.join(", ")}
               </p>
             )}
@@ -215,11 +215,11 @@ export default function ContractLibrary({
         )}
 
         {justSent && (
-          <div className="mt-3 rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 shadow-[0_0_28px_rgba(59,130,246,0.15)]">
-            <p className="text-sm font-semibold tracking-tight text-blue-100">
+          <div className="mt-3 rounded-lg border border-blue-500/50 bg-blue-500/15 p-3 shadow-[0_0_28px_rgba(59,130,246,0.15)] dark:border-blue-500/40 dark:bg-blue-500/10">
+            <p className="text-sm font-semibold tracking-tight text-blue-900 dark:text-blue-100">
               ✓ Signing link ready — {justSent.kind.replace(/_/g, " ")}
             </p>
-            <p className="mt-1 text-[11px] text-blue-200/80">
+            <p className="mt-1 text-[11px] text-blue-800 dark:text-blue-200/80">
               {justSent.prefilledCount} field
               {justSent.prefilledCount === 1 ? "" : "s"} pre-filled from this
               tenant&apos;s profile. Link expires in 30 days.
@@ -229,14 +229,14 @@ export default function ContractLibrary({
                 href={justSent.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-blue-500/40 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-blue-200 hover:bg-zinc-900"
+                className="rounded-md border border-blue-500/50 bg-white px-2.5 py-1 text-[11px] font-semibold text-blue-800 hover:bg-blue-50 dark:border-blue-500/40 dark:bg-zinc-950 dark:text-blue-200 dark:hover:bg-zinc-900"
               >
                 ↗ Open signing page
               </a>
               <CopyLinkPill url={justSent.url} label="Copy signing link" />
             </div>
             {justSent.required.length > 0 && (
-              <p className="mt-2 font-mono text-[10px] text-amber-300/80">
+              <p className="mt-2 font-mono text-[10px] font-medium text-amber-700 dark:text-amber-300/80">
                 Tenant will be asked to fill: {justSent.required.join(", ")}
               </p>
             )}
@@ -244,7 +244,7 @@ export default function ContractLibrary({
         )}
 
         {error && (
-          <p className="mt-3 rounded-md border border-rose-500/30 bg-rose-500/10 px-2.5 py-1.5 text-[11px] text-rose-200">
+          <p className="mt-3 rounded-md border border-rose-500/40 bg-rose-500/15 px-2.5 py-1.5 text-[11px] font-medium text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
             ⚠ {error}
           </p>
         )}

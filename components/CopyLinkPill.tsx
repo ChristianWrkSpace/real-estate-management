@@ -39,8 +39,8 @@ export default function CopyLinkPill({
         onClick={copy}
         className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
           copied
-            ? "border-emerald-500/60 bg-emerald-500/20 text-emerald-100"
-            : "border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:border-emerald-400/60 hover:bg-emerald-500/20"
+            ? "border-emerald-500/60 bg-emerald-500/20 text-emerald-800 dark:text-emerald-100"
+            : "border-emerald-500/50 bg-emerald-500/15 text-emerald-800 hover:border-emerald-500/70 hover:bg-emerald-500/25 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:border-emerald-400/60 dark:hover:bg-emerald-500/20"
         }`}
         aria-live="polite"
       >

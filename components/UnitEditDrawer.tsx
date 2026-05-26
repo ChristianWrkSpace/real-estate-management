@@ -266,11 +266,11 @@ export function DigitalLeaseLinkCard({
   };
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-950 to-blue-500/10 p-4 shadow-[0_0_28px_rgba(16,185,129,0.10)]">
+    <div className="rounded-xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 via-white to-blue-500/10 p-4 shadow-[0_0_28px_rgba(16,185,129,0.10)] dark:border-emerald-500/30 dark:via-zinc-950">
       <p className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
         Generate Digital Lease Agreement Link
       </p>
-      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{contextHint}</p>
+      <p className="mt-1 text-xs text-zinc-700 dark:text-zinc-400">{contextHint}</p>
 
       {!url && (
         <button
@@ -289,7 +289,7 @@ export function DigitalLeaseLinkCard({
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block truncate rounded-md border border-emerald-500/30 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1.5 font-mono text-[11px] text-emerald-200 underline-offset-2 hover:underline"
+            className="block truncate rounded-md border border-emerald-500/40 bg-zinc-50 px-2.5 py-1.5 font-mono text-[11px] text-emerald-800 underline-offset-2 hover:underline dark:border-emerald-500/30 dark:bg-zinc-950 dark:text-emerald-200"
             title={url}
           >
             {url}
@@ -299,7 +299,7 @@ export function DigitalLeaseLinkCard({
       )}
 
       {error && (
-        <p className="mt-3 rounded-md border border-rose-500/30 bg-rose-500/10 px-2.5 py-1.5 text-[11px] text-rose-200">
+        <p className="mt-3 rounded-md border border-rose-500/40 bg-rose-500/15 px-2.5 py-1.5 text-[11px] font-medium text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
           ⚠ {error}
         </p>
       )}
