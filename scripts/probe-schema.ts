@@ -10,17 +10,8 @@ const supabase = createClient(
 );
 
 const TABLES_AND_COLUMNS: Record<string, string[]> = {
-  vendors: [
-    "id",
-    "property_id",
-    "name",
-    "trade",
-    "phone",
-    "email",
-    "billing_rate",
-    "notes",
-    "created_at",
-  ],
+  transactions: ["id", "property_id", "unit_id", "amount", "date", "type", "category", "description"],
+  vendors: ["id", "property_id", "name", "trade", "phone", "email", "billing_rate", "notes", "created_at"],
   work_orders: [
     "id",
     "property_id",
@@ -39,6 +30,7 @@ const TABLES_AND_COLUMNS: Record<string, string[]> = {
     "completed_at",
     "created_at",
   ],
+  ai_logs: ["id", "agent_name", "task_description", "model_used", "token_cost", "status", "output_data"],
 };
 
 async function probeColumns() {
@@ -46,18 +38,25 @@ async function probeColumns() {
     console.log(`\n── ${table} ──`);
     const present: string[] = [];
     const missing: string[] = [];
+    let tableMissing = false;
     for (const col of cols) {
       const { error } = await supabase.from(table).select(col).limit(0);
-      if (error && /column .* does not exist/i.test(error.message)) {
-        missing.push(col);
-      } else if (error) {
-        console.log(`  ⚠ ${col}: ${error.message}`);
-      } else {
+      if (!error) {
         present.push(col);
+      } else if (/column .* does not exist/i.test(error.message)) {
+        missing.push(col);
+      } else if (/(relation|table).* does not exist|schema cache/i.test(error.message)) {
+        console.log(`  ⛔ table missing or cache stale: ${error.message}`);
+        tableMissing = true;
+        break;
+      } else {
+        console.log(`  ⚠ ${col}: ${error.message}`);
       }
     }
-    console.log(`  present (${present.length}): ${present.join(", ") || "(none)"}`);
-    console.log(`  missing (${missing.length}): ${missing.join(", ") || "(none)"}`);
+    if (!tableMissing) {
+      console.log(`  present (${present.length}): ${present.join(", ") || "(none)"}`);
+      console.log(`  missing (${missing.length}): ${missing.join(", ") || "(none)"}`);
+    }
   }
 }
 
