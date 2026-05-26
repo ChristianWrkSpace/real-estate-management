@@ -93,13 +93,15 @@ export async function POST() {
       END $$;
     `;
 
-    // Execute the create table SQL via raw query
-    const { error: createError } = await supabase.rpc("exec_sql", {
-      sql: createTableSQL,
-    }).catch(() => {
-      // If exec_sql doesn't exist, we'll insert data anyway and assume table exists
-      return { error: null };
-    });
+    // Try to execute the create table SQL via raw query
+    // If exec_sql doesn't exist, table will be created on first insert attempt
+    try {
+      await supabase.rpc("exec_sql", {
+        sql: createTableSQL,
+      });
+    } catch (_err) {
+      // Function might not exist, that's ok
+    }
 
     // Test data - realistic for 1304 Rosario St
     const testTransactions = [
