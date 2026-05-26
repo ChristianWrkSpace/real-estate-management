@@ -176,7 +176,7 @@ function SectionGroup({
                     </p>
                   )}
                 </span>
-                <span className="text-zinc-400 dark:text-zinc-500">
+                <span className="text-zinc-600 dark:text-zinc-400 dark:text-zinc-500">
                   <IconChevron />
                 </span>
               </Link>

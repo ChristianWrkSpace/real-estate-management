@@ -23,7 +23,7 @@ export default function PnlPeriodTabs({ active }: { active: string }) {
   };
 
   return (
-    <div className="inline-flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/80 p-1">
+    <div className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-1">
       {PERIODS.map((p) => {
         const isActive = p.key === active;
         return (
@@ -35,7 +35,7 @@ export default function PnlPeriodTabs({ active }: { active: string }) {
             className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
               isActive
                 ? "bg-emerald-500/15 text-emerald-200"
-                : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
             }`}
           >
             {p.label}

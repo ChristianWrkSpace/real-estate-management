@@ -44,19 +44,19 @@ export default function EditDrawerShell({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <aside className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-zinc-800 bg-zinc-950 shadow-2xl">
-        <header className="flex items-start justify-between border-b border-zinc-800 bg-zinc-900/60 p-5">
+      <aside className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 shadow-2xl">
+        <header className="flex items-start justify-between border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/70 dark:bg-zinc-900/60 p-5">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-zinc-100">
+            <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               {title}
             </h2>
-            {subtitle && <p className="mt-0.5 text-xs text-zinc-400">{subtitle}</p>}
+            {subtitle && <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">{subtitle}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+            className="rounded-md p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
           >
             ✕
           </button>

@@ -85,7 +85,7 @@ export default function DispatchSuggestionPanel({
       )}
 
       {open && (
-        <div className="rounded-xl border border-indigo-500/30 bg-zinc-950/80 p-3.5 shadow-[0_0_36px_rgba(99,102,241,0.18)]">
+        <div className="rounded-xl border border-indigo-500/30 bg-white dark:bg-zinc-950/80 p-3.5 shadow-[0_0_36px_rgba(99,102,241,0.18)]">
           <div className="mb-2.5 flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-300">
               ✦ Suggested Dispatch
@@ -100,7 +100,7 @@ export default function DispatchSuggestionPanel({
           </div>
 
           {loadingSuggestion && (
-            <p className="text-xs text-zinc-400">Analyzing ticket…</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">Analyzing ticket…</p>
           )}
 
           {suggestion && (
@@ -116,7 +116,7 @@ export default function DispatchSuggestionPanel({
                   {suggestion.trade_confidence}
                 </span>
                 {suggestion.ai_used && (
-                  <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-zinc-400">
+                  <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                     haiku
                   </span>
                 )}
@@ -124,13 +124,13 @@ export default function DispatchSuggestionPanel({
 
               {/* Vendor match */}
               {suggestion.matched_vendor ? (
-                <div className="mb-3 rounded-lg border border-zinc-800 bg-zinc-900/70 px-3 py-2.5">
+                <div className="mb-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-900/70 px-3 py-2.5">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-sm font-semibold tracking-tight text-zinc-100">
+                    <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                       {suggestion.matched_vendor.name}
                     </span>
                     {suggestion.matched_vendor.billing_rate != null && (
-                      <span className="font-mono text-xs text-zinc-400">
+                      <span className="font-mono text-xs text-zinc-600 dark:text-zinc-400">
                         ${suggestion.matched_vendor.billing_rate}/hr
                       </span>
                     )}
@@ -224,7 +224,7 @@ function Pill({
   const cls =
     tone === "primary"
       ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-      : "border-zinc-800 bg-zinc-900/60 text-zinc-300";
+      : "border-zinc-200 dark:border-zinc-800 bg-zinc-100/70 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300";
   return (
     <div className={`rounded-md border px-2 py-1 ${cls}`}>
       <p className="text-[9px] font-semibold uppercase tracking-wider opacity-70">

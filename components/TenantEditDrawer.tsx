@@ -159,7 +159,7 @@ export default function TenantEditDrawer({
                 className={inputClass}
               >
                 {units.map((u) => (
-                  <option key={u.id} value={u.id} className="bg-zinc-900">
+                  <option key={u.id} value={u.id} className="bg-zinc-100 dark:bg-zinc-900">
                     Unit {u.unit_number}
                     {u.status === "occupied" && u.id !== tenant.active_lease_unit_id
                       ? " (currently occupied)"
@@ -231,4 +231,4 @@ export default function TenantEditDrawer({
 }
 
 const inputClass =
-  "w-full bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
+  "w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";

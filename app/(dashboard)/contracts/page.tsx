@@ -58,10 +58,10 @@ export default async function ContractsPage() {
     <div className="min-h-screen bg-[var(--canvas)] text-[var(--fg)] p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         <header>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             Contracts
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
             Master template library · click ✎ to edit label / description /
             availability, ⤒ to upload a new version of any template.
           </p>
@@ -78,11 +78,11 @@ export default async function ContractsPage() {
           </div>
 
           {templates.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-8 text-center text-sm text-zinc-500 shadow-xl">
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-8 text-center text-sm text-zinc-500 shadow-xl">
               No templates registered. Drop .docx files into{" "}
-              <code className="text-zinc-300">~/Downloads/Rental contracts/</code>{" "}
+              <code className="text-zinc-700 dark:text-zinc-300">~/Downloads/Rental contracts/</code>{" "}
               then run{" "}
-              <code className="text-zinc-300">
+              <code className="text-zinc-700 dark:text-zinc-300">
                 npx tsx scripts/upload-templates.ts
               </code>
               .
@@ -107,14 +107,14 @@ export default async function ContractsPage() {
           </div>
 
           {generated.length === 0 ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-8 text-center text-sm text-zinc-500 shadow-xl">
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-8 text-center text-sm text-zinc-500 shadow-xl">
               Nothing generated yet. Open a tenant&apos;s drawer and use the
               Contract Library section to issue their first contract.
             </div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/80 shadow-xl">
+            <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-xl">
               <table className="w-full">
-                <thead className="border-b border-zinc-800 bg-zinc-900">
+                <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
                   <tr>
                     <Th>Document</Th>
                     <Th>Tenant</Th>
@@ -124,21 +124,21 @@ export default async function ContractsPage() {
                     <Th align="right">Action</Th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                   {generated.map((d) => (
                     <tr key={d.id} className="transition hover:bg-zinc-900/60">
                       <td className="px-5 py-3 text-sm">
-                        <p className="truncate text-zinc-100" title={d.label}>
+                        <p className="truncate text-zinc-900 dark:text-zinc-100" title={d.label}>
                           {d.label}
                         </p>
                       </td>
-                      <td className="px-5 py-3 text-xs text-zinc-300">
+                      <td className="px-5 py-3 text-xs text-zinc-700 dark:text-zinc-300">
                         {d.tenant_name ?? "—"}
                       </td>
                       <td className="px-5 py-3 font-mono text-[10px] text-zinc-500">
                         {d.template_kind}
                       </td>
-                      <td className="px-5 py-3 text-xs text-zinc-400">
+                      <td className="px-5 py-3 text-xs text-zinc-600 dark:text-zinc-400">
                         {new Date(d.generated_at).toLocaleString()}
                       </td>
                       <td className="px-5 py-3 text-xs">
@@ -147,7 +147,7 @@ export default async function ContractsPage() {
                             ✓ {new Date(d.signed_at).toLocaleDateString()}
                           </span>
                         ) : (
-                          <span className="rounded-full border border-zinc-700 bg-zinc-950 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
+                          <span className="rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
                             unsigned
                           </span>
                         )}
@@ -158,7 +158,7 @@ export default async function ContractsPage() {
                             href={d.download_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1 text-[10px] font-semibold text-zinc-300 hover:bg-zinc-900"
+                            className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2 py-1 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900"
                           >
                             open
                           </a>
@@ -185,7 +185,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 ${
+      className={`px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >

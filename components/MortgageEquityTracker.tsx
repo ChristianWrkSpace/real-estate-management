@@ -97,7 +97,7 @@ export default function MortgageEquityTracker({
 
   if (!breakdown) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 text-center text-sm text-zinc-500 shadow-xl">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-6 text-center text-sm text-zinc-500 shadow-xl">
         No property data — set value, mortgage balance, and interest rate to enable the
         equity tracker.
       </div>
@@ -110,10 +110,10 @@ export default function MortgageEquityTracker({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border bg-zinc-900/80 p-6 shadow-xl transition-all duration-300 ${
+      className={`overflow-hidden rounded-xl border bg-white dark:bg-zinc-900/80 p-6 shadow-xl transition-all duration-300 ${
         flash
           ? "border-emerald-400/60 shadow-[0_0_48px_rgba(16,185,129,0.30)]"
-          : "border-zinc-800 hover:border-zinc-700"
+          : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-700"
       }`}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -121,7 +121,7 @@ export default function MortgageEquityTracker({
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
             ◢ Mortgage &amp; Equity Tracker
           </span>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
             {fmtPct(breakdown.interest_rate_pct, 2)} fixed · {breakdown.amort_years}-yr amort
             {breakdown.payment_is_override && (
               <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-amber-300">
@@ -135,7 +135,7 @@ export default function MortgageEquityTracker({
             <button
               type="button"
               onClick={openEdit}
-              className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900"
+              className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-900"
             >
               ✎ Edit
             </button>
@@ -182,7 +182,7 @@ export default function MortgageEquityTracker({
 
       {/* Edit form */}
       {editing && (
-        <div className="mb-5 rounded-xl border border-emerald-400/30 bg-zinc-950/80 p-4 shadow-[0_0_28px_rgba(16,185,129,0.10)]">
+        <div className="mb-5 rounded-xl border border-emerald-400/30 bg-white dark:bg-zinc-950/80 p-4 shadow-[0_0_28px_rgba(16,185,129,0.10)]">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-300">
             Edit Mortgage Profile
           </p>
@@ -249,7 +249,7 @@ export default function MortgageEquityTracker({
               type="button"
               onClick={() => setEditing(false)}
               disabled={isSaving}
-              className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-zinc-600 hover:bg-zinc-900"
+              className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-600 hover:bg-zinc-900"
             >
               Cancel
             </button>
@@ -283,7 +283,7 @@ export default function MortgageEquityTracker({
             value={override}
             onChange={(e) => setOverride(e.target.value)}
             placeholder={breakdown.scheduled_monthly_payment.toFixed(2)}
-            className="w-36 rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-xs text-zinc-100 focus:border-emerald-500 focus:outline-none"
+            className="w-36 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2 py-1 text-xs text-zinc-900 dark:text-zinc-100 focus:border-emerald-500 focus:outline-none"
           />
           <span className="text-[11px] text-zinc-500">
             blank = use scheduled
@@ -309,12 +309,12 @@ export default function MortgageEquityTracker({
 }
 
 const inputClass =
-  "w-full bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-lg px-3 py-2 text-sm font-mono placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
+  "w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg px-3 py-2 text-sm font-mono placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
 
 function EditField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
         {label}
       </span>
       {children}
@@ -340,10 +340,10 @@ function Big({
       ? "text-emerald-400"
       : accent === "indigo"
         ? "text-indigo-300"
-        : "text-zinc-100";
+        : "text-zinc-900 dark:text-zinc-100";
   return (
     <div
-      className={`rounded-xl border border-zinc-800 bg-zinc-950 p-4 transition ${
+      className={`rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-4 transition ${
         flash && accent === "emerald" ? "scale-[1.02] shadow-[0_0_24px_rgba(16,185,129,0.4)]" : ""
       }`}
     >

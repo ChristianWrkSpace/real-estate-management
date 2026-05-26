@@ -77,10 +77,10 @@ export default function ContractLibrary({
         Contract Library
       </h3>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-        <p className="text-xs text-zinc-400">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4">
+        <p className="text-xs text-zinc-600 dark:text-zinc-400">
           Generate any template filled with this tenant&apos;s current profile +
-          active lease. Saved to <span className="text-zinc-300">contracts</span>{" "}
+          active lease. Saved to <span className="text-zinc-700 dark:text-zinc-300">contracts</span>{" "}
           bucket and attached to the tenant&apos;s profile.
         </p>
 
@@ -104,11 +104,11 @@ export default function ContractLibrary({
               return (
                 <div
                   key={t.id}
-                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold tracking-tight text-zinc-100">
+                      <p className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                         {t.label}
                       </p>
                       {t.description && (
@@ -159,7 +159,7 @@ export default function ContractLibrary({
                 href={justGenerated.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-emerald-500/40 bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 hover:bg-zinc-900"
+                className="rounded-md border border-emerald-500/40 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-emerald-200 hover:bg-zinc-900"
               >
                 ⬇ Download .docx
               </a>
@@ -182,7 +182,7 @@ export default function ContractLibrary({
 
       {/* Saved documents list */}
       {documents.length > 0 && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-4">
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
             Saved to profile
           </p>
@@ -193,7 +193,7 @@ export default function ContractLibrary({
                 className="flex items-center justify-between gap-2 text-[11px]"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-zinc-200" title={d.label}>
+                  <p className="truncate text-zinc-800 dark:text-zinc-200" title={d.label}>
                     {d.label}
                   </p>
                   <p className="text-[10px] text-zinc-500">
@@ -206,7 +206,7 @@ export default function ContractLibrary({
                     href={d.download_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 rounded-md border border-zinc-700 bg-zinc-950 px-2 py-0.5 text-[10px] font-semibold text-zinc-300 hover:bg-zinc-900"
+                    className="shrink-0 rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2 py-0.5 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900"
                   >
                     open
                   </a>

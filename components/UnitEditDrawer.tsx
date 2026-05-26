@@ -156,9 +156,9 @@ export default function UnitEditDrawer({
             }
             className={inputClass}
           >
-            <option value="vacant" className="bg-zinc-900">Vacant</option>
-            <option value="occupied" className="bg-zinc-900">Occupied</option>
-            <option value="maintenance" className="bg-zinc-900">Maintenance</option>
+            <option value="vacant" className="bg-zinc-100 dark:bg-zinc-900">Vacant</option>
+            <option value="occupied" className="bg-zinc-100 dark:bg-zinc-900">Occupied</option>
+            <option value="maintenance" className="bg-zinc-100 dark:bg-zinc-900">Maintenance</option>
           </select>
         </Field>
 
@@ -213,7 +213,7 @@ export default function UnitEditDrawer({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const inputClass =
-  "w-full bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
+  "w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/40 disabled:opacity-60";
 
 export function Field({
   label,
@@ -224,7 +224,7 @@ export function Field({
 }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
         {label}
       </span>
       {children}
@@ -267,10 +267,10 @@ export function DigitalLeaseLinkCard({
 
   return (
     <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-zinc-950 to-blue-500/10 p-4 shadow-[0_0_28px_rgba(16,185,129,0.10)]">
-      <p className="text-sm font-semibold tracking-tight text-zinc-100">
+      <p className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
         Generate Digital Lease Agreement Link
       </p>
-      <p className="mt-1 text-xs text-zinc-400">{contextHint}</p>
+      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{contextHint}</p>
 
       {!url && (
         <button
@@ -289,7 +289,7 @@ export function DigitalLeaseLinkCard({
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block truncate rounded-md border border-emerald-500/30 bg-zinc-950 px-2.5 py-1.5 font-mono text-[11px] text-emerald-200 underline-offset-2 hover:underline"
+            className="block truncate rounded-md border border-emerald-500/30 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1.5 font-mono text-[11px] text-emerald-200 underline-offset-2 hover:underline"
             title={url}
           >
             {url}

@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4 text-white">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-4 text-white">
       {/* Ambient gradient blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-32 -right-32 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl" />

@@ -39,10 +39,10 @@ export default function PnlStatement({ pnl }: { pnl: PnlBundle }) {
       </div>
 
       {/* The Statement */}
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/80 shadow-xl">
-        <header className="border-b border-zinc-800 bg-zinc-900 px-5 py-3">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-xl">
+        <header className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 px-5 py-3">
           <div className="flex items-baseline justify-between">
-            <h3 className="text-sm font-semibold tracking-tight text-zinc-100">
+            <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Profit &amp; Loss Statement
             </h3>
             <p className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
@@ -204,7 +204,7 @@ function Kpi({
           ? "text-blue-400"
           : "text-indigo-400";
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-5 shadow-xl">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-5 shadow-xl">
       <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
         {label}
       </p>
@@ -257,10 +257,10 @@ function Row({
       ? "text-blue-300"
       : positive
         ? "text-emerald-300"
-        : "text-zinc-200";
+        : "text-zinc-800 dark:text-zinc-200";
   return (
     <div className="flex items-baseline justify-between py-1 text-sm">
-      <span className="flex items-baseline gap-2 text-zinc-300">
+      <span className="flex items-baseline gap-2 text-zinc-700 dark:text-zinc-300">
         <span className="text-zinc-500">·</span>
         <span>{label}</span>
         {count != null && count > 0 && (
@@ -288,11 +288,11 @@ function TotalRow({
   positive?: boolean;
 }) {
   return (
-    <div className="mt-1.5 flex items-baseline justify-between border-t border-zinc-800 pt-2 text-sm font-semibold">
-      <span className="text-zinc-100">{label}</span>
+    <div className="mt-1.5 flex items-baseline justify-between border-t border-zinc-200 dark:border-zinc-800 pt-2 text-sm font-semibold">
+      <span className="text-zinc-900 dark:text-zinc-100">{label}</span>
       <span
         className={`font-mono ${
-          positive ? "text-emerald-400" : "text-zinc-100"
+          positive ? "text-emerald-400" : "text-zinc-900 dark:text-zinc-100"
         }`}
       >
         {positive ? "+" : ""}
@@ -323,14 +323,14 @@ function NoiRow({
     accent === "emerald" ? "text-emerald-400" : "text-blue-400";
   return (
     <div
-      className={`my-4 rounded-lg border bg-zinc-950 px-4 py-3 ${
+      className={`my-4 rounded-lg border bg-zinc-50 dark:bg-zinc-950 px-4 py-3 ${
         accent === "emerald"
           ? "border-emerald-500/40 shadow-[0_0_28px_rgba(16,185,129,0.10)]"
           : "border-blue-500/40 shadow-[0_0_28px_rgba(59,130,246,0.10)]"
       }`}
     >
       <div className="flex items-baseline justify-between">
-        <span className="text-xs font-bold uppercase tracking-widest text-zinc-300">
+        <span className="text-xs font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">
           {label}
         </span>
         <span className={`font-mono text-xl font-semibold ${valCls}`}>
@@ -351,7 +351,7 @@ function RatioPanel({
   items: { label: string; value: string; hint?: string }[];
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-5 shadow-xl">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 p-5 shadow-xl">
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
         {title}
       </h3>
@@ -362,12 +362,12 @@ function RatioPanel({
             className="flex items-baseline justify-between border-b border-zinc-800/50 pb-2 last:border-0"
           >
             <span>
-              <p className="text-sm text-zinc-200">{i.label}</p>
+              <p className="text-sm text-zinc-800 dark:text-zinc-200">{i.label}</p>
               {i.hint && (
                 <p className="text-[10px] text-zinc-500">{i.hint}</p>
               )}
             </span>
-            <span className="font-mono text-sm font-semibold text-zinc-100">
+            <span className="font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {i.value}
             </span>
           </li>

@@ -44,14 +44,14 @@ export default function UnitsGrid({ units }: { units: UnitDrawerData[] }) {
               key={u.id}
               type="button"
               onClick={() => setActiveId(u.id)}
-              className={`group bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl text-left transition hover:border-zinc-700 ${tone.glow}`}
+              className={`group bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-xl text-left transition hover:border-zinc-700 ${tone.glow}`}
             >
               <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold tracking-tight text-zinc-100">
+                  <h3 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                     Unit {u.unit_number}
                   </h3>
-                  <p className="mt-0.5 text-xs text-zinc-400">
+                  <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
                     {u.bedrooms ?? "?"}BR · {u.bathrooms ?? "?"}BA
                     {u.sqft ? ` · ${u.sqft} sqft` : ""}
                   </p>
@@ -65,7 +65,7 @@ export default function UnitsGrid({ units }: { units: UnitDrawerData[] }) {
               </div>
 
               <div className="space-y-2 text-sm">
-                <p className="text-zinc-300">
+                <p className="text-zinc-700 dark:text-zinc-300">
                   <span className="text-xs text-zinc-500">Rent · </span>
                   <span className="font-mono font-semibold text-emerald-400">
                     {fmtUsd(u.monthly_rent)}
@@ -73,7 +73,7 @@ export default function UnitsGrid({ units }: { units: UnitDrawerData[] }) {
                   <span className="text-xs text-zinc-500">/mo</span>
                 </p>
                 {u.tenant_name && (
-                  <p className="truncate text-xs text-zinc-400" title={u.tenant_name}>
+                  <p className="truncate text-xs text-zinc-600 dark:text-zinc-400" title={u.tenant_name}>
                     👤 {u.tenant_name}
                   </p>
                 )}

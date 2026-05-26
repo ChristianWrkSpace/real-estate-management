@@ -72,10 +72,10 @@ export default async function FinancePage({
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Finances
             </h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               {pnl?.property_name ?? "Property"} · Full P&amp;L · Live mortgage tracker · Per-unit matrix
             </p>
           </div>
@@ -115,9 +115,9 @@ export default async function FinancePage({
           <h2 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
             Recent Transactions
           </h2>
-          <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/80 shadow-xl">
+          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-xl">
             <table className="w-full">
-              <thead className="border-b border-zinc-800 bg-zinc-900">
+              <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
                 <tr>
                   <Th>Date</Th>
                   <Th>Description</Th>
@@ -129,14 +129,14 @@ export default async function FinancePage({
               <tbody className="divide-y divide-zinc-800/60">
                 {(txs ?? []).map((t) => (
                   <tr key={t.id} className="text-sm transition hover:bg-zinc-900/60">
-                    <td className="px-5 py-3 font-mono text-xs text-zinc-400">
+                    <td className="px-5 py-3 font-mono text-xs text-zinc-600 dark:text-zinc-400">
                       {new Date(t.date).toLocaleDateString("en-US", {
                         month: "short",
                         day: "2-digit",
                         year: "2-digit",
                       })}
                     </td>
-                    <td className="px-5 py-3 text-zinc-200">{t.description ?? "—"}</td>
+                    <td className="px-5 py-3 text-zinc-800 dark:text-zinc-200">{t.description ?? "—"}</td>
                     <td className="px-5 py-3 text-xs text-zinc-500">
                       {t.unit_id ? `#${unitNumberById.get(t.unit_id) ?? "?"}` : "—"}
                     </td>
@@ -188,7 +188,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 ${
+      className={`px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >

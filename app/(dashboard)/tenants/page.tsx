@@ -85,8 +85,8 @@ export default async function TenantsPage() {
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex items-baseline justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">Tenants</h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Tenants</h1>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               {property?.name ?? "Property"} · click any name to edit, generate links, reassign units
             </p>
           </div>

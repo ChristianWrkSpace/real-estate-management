@@ -111,15 +111,15 @@ export default async function DashboardPage() {
         {/* Header */}
         <header className="flex items-baseline justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Dashboard
             </h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               {property?.name ?? "Property"} · Welcome, {user?.name}
             </p>
           </div>
           {initialReport?.asOf && (
-            <span className="rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-zinc-500">
+            <span className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-zinc-500">
               audit · {initialReport.asOf}
             </span>
           )}
@@ -211,7 +211,7 @@ export default async function DashboardPage() {
         {property && (
           <section className="space-y-3">
             <SectionLabel>Property Snapshot</SectionLabel>
-            <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
+            <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-xl">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <Detail label="Address" value={property.name} />
                 <Detail label="Units" value={`${property.units_count} total`} />
@@ -263,8 +263,8 @@ function StatCard({
   accent: Accent;
 }) {
   return (
-    <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
-      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+    <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-xl">
+      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
         {label}
       </p>
       <p
@@ -272,15 +272,15 @@ function StatCard({
       >
         {metric}
       </p>
-      <p className="mt-1.5 text-xs text-zinc-400">{description}</p>
+      <p className="mt-1.5 text-xs text-zinc-600 dark:text-zinc-400">{description}</p>
     </div>
   );
 }
 
 function QuickActionsPanel() {
   return (
-    <div className="bg-zinc-900/80 border border-zinc-800 p-6 rounded-xl shadow-xl">
-      <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">
+    <div className="bg-white dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 p-6 rounded-xl shadow-xl">
+      <p className="text-xs font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400">
         ⚡ Quick Actions
       </p>
       <p className="mt-1 text-xs text-zinc-500">Jump to any module</p>
@@ -289,11 +289,11 @@ function QuickActionsPanel() {
           <a
             key={q.href}
             href={q.href}
-            className="group flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2.5 transition hover:border-zinc-700 hover:bg-zinc-900"
+            className="group flex items-center justify-between rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-3 py-2.5 transition hover:border-zinc-700 hover:bg-zinc-900"
           >
             <div className="flex items-center gap-2.5">
               <span className="text-base">{q.icon}</span>
-              <span className="text-sm font-semibold tracking-tight text-zinc-100">
+              <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                 {q.label}
               </span>
             </div>
@@ -325,7 +325,7 @@ function Detail({
       <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">{label}</p>
       <p
         className={`mt-1 text-sm font-semibold tracking-tight ${mono ? "font-mono" : ""} ${
-          accent ? "text-emerald-400" : "text-zinc-100"
+          accent ? "text-emerald-400" : "text-zinc-900 dark:text-zinc-100"
         }`}
       >
         {value}

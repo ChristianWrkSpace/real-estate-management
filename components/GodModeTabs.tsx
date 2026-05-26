@@ -55,7 +55,7 @@ export default function GodModeTabs({ tax, capital, yieldData }: GodModeTabsProp
 
   return (
     <div
-      className={`rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md transition-all duration-300 hover:border-zinc-700 ${activeTab.glow}`}
+      className={`rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 backdrop-blur-md transition-all duration-300 hover:border-zinc-700 ${activeTab.glow}`}
     >
       {/* Tab strip — no border-bottom; selection is shown by the pill color + dot */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4">
@@ -78,7 +78,7 @@ export default function GodModeTabs({ tax, capital, yieldData }: GodModeTabsProp
                 className={`group flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
                   isActive
                     ? tab.pill
-                    : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/70 hover:text-zinc-200"
+                    : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 text-zinc-600 dark:text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/70 hover:text-zinc-200"
                 }`}
                 aria-pressed={isActive}
               >

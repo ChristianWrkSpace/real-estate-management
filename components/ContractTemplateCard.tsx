@@ -72,8 +72,8 @@ export default function ContractTemplateCard({
     <div
       className={`rounded-xl border p-5 shadow-xl transition ${
         template.active
-          ? "border-zinc-800 bg-zinc-900/80 hover:border-zinc-700"
-          : "border-zinc-800 bg-zinc-900/40 opacity-70"
+          ? "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 hover:border-zinc-700"
+          : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 opacity-70"
       }`}
     >
       <header className="mb-3 flex items-start justify-between gap-3">
@@ -82,10 +82,10 @@ export default function ContractTemplateCard({
             <input
               value={local.label}
               onChange={(e) => setLocal({ ...local, label: e.target.value })}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-100 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2 py-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100 focus:border-emerald-500 focus:outline-none"
             />
           ) : (
-            <h3 className="truncate text-base font-semibold tracking-tight text-zinc-100">
+            <h3 className="truncate text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               {template.label}
             </h3>
           )}
@@ -102,7 +102,7 @@ export default function ContractTemplateCard({
           className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
             template.active
               ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-200"
-              : "border-zinc-700 bg-zinc-950 text-zinc-500"
+              : "border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-zinc-500"
           }`}
         >
           {template.active ? "active" : "inactive"}
@@ -112,24 +112,24 @@ export default function ContractTemplateCard({
       {editing ? (
         <div className="space-y-3">
           <label className="block space-y-1.5">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
               Description
             </span>
             <textarea
               value={local.description}
               onChange={(e) => setLocal({ ...local, description: e.target.value })}
               rows={2}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-2 py-1.5 text-xs text-zinc-100 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:border-emerald-500 focus:outline-none"
             />
           </label>
-          <label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5">
+          <label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1.5">
             <input
               type="checkbox"
               checked={local.active}
               onChange={(e) => setLocal({ ...local, active: e.target.checked })}
               className="h-3.5 w-3.5 accent-emerald-500"
             />
-            <span className="text-xs text-zinc-300">
+            <span className="text-xs text-zinc-700 dark:text-zinc-300">
               Available in the tenant Contract Library
             </span>
           </label>
@@ -153,7 +153,7 @@ export default function ContractTemplateCard({
                 setEditing(false);
               }}
               disabled={isPending}
-              className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:bg-zinc-900"
+              className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900"
             >
               Cancel
             </button>
@@ -162,12 +162,12 @@ export default function ContractTemplateCard({
       ) : (
         <>
           {template.description && (
-            <p className="mb-3 text-xs leading-relaxed text-zinc-400">
+            <p className="mb-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
               {template.description}
             </p>
           )}
 
-          <div className="mb-3 rounded-lg border border-zinc-800 bg-zinc-950 p-2.5">
+          <div className="mb-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Placeholders ({template.placeholders.length})
             </p>
@@ -181,7 +181,7 @@ export default function ContractTemplateCard({
                 {template.placeholders.map((p) => (
                   <li
                     key={p}
-                    className="rounded border border-zinc-800 bg-zinc-900 px-1.5 py-0.5 font-mono text-[10px] text-zinc-300"
+                    className="rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 font-mono text-[10px] text-zinc-700 dark:text-zinc-300"
                   >
                     {p}
                   </li>
@@ -196,7 +196,7 @@ export default function ContractTemplateCard({
                 href={template.download_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-200 hover:bg-zinc-900"
+                className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-900"
               >
                 ⬇ Download original
               </a>
@@ -223,7 +223,7 @@ export default function ContractTemplateCard({
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="rounded-md border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-200 hover:bg-zinc-900"
+              className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-900"
             >
               ✎ Edit
             </button>

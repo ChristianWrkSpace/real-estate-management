@@ -26,9 +26,9 @@ export default function TenantsTable({
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/80 shadow-xl">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-xl">
         <table className="w-full">
-          <thead className="border-b border-zinc-800 bg-zinc-900">
+          <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
             <tr>
               <Th>Name</Th>
               <Th>Contact</Th>
@@ -39,7 +39,7 @@ export default function TenantsTable({
               <Th align="right">Enforcement</Th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {tenants.map((t) => (
               <tr
                 key={t.id}
@@ -49,7 +49,7 @@ export default function TenantsTable({
                   <button
                     type="button"
                     onClick={() => setActiveId(t.id)}
-                    className="text-left font-semibold tracking-tight text-zinc-100 transition hover:text-emerald-300"
+                    className="text-left font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 transition hover:text-emerald-300"
                   >
                     {t.first_name} {t.last_name}
                     <span className="ml-1 text-[10px] font-normal text-zinc-500">
@@ -62,7 +62,7 @@ export default function TenantsTable({
                     </p>
                   )}
                 </td>
-                <td className="px-6 py-4 text-sm text-zinc-400">
+                <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
                   <div>{t.email ?? "—"}</div>
                   <div className="text-xs text-zinc-500">{t.phone ?? "—"}</div>
                 </td>
@@ -120,7 +120,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-6 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 ${
+      className={`px-6 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 ${
         align === "right" ? "text-right" : "text-left"
       }`}
     >
