@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { updateTenantProfile } from "@/app/actions/profiles";
 import EditDrawerShell from "@/components/EditDrawerShell";
 import { Field, SectionHeader, DigitalLeaseLinkCard } from "@/components/UnitEditDrawer";
+import ContractLibrary from "@/components/ContractLibrary";
 
 export type TenantDrawerData = {
   id: string;
@@ -216,6 +217,13 @@ export default function TenantEditDrawer({
               ? `One-time-use 24-byte token. Send to ${tenant.first_name} via iMessage / WhatsApp; the link expires when accepted or regenerated.`
               : "No active lease yet. Create one for this tenant first."
           }
+        />
+      </div>
+
+      <div className="mt-6">
+        <ContractLibrary
+          tenantId={tenant.id}
+          tenantHasActiveLease={!!tenant.active_lease_id}
         />
       </div>
     </EditDrawerShell>
