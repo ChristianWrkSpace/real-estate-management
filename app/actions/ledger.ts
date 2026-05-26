@@ -255,6 +255,9 @@ export type MortgageBreakdown = {
   interest_rate_pct: number;
   amort_years: number;
   scheduled_monthly_payment: number;
+  /** True when scheduled_monthly_payment came from properties.monthly_payment
+   *  (operator override) rather than the PMT formula. */
+  payment_is_override: boolean;
   this_month_interest: number;
   this_month_principal: number;
   projected_balance_after_payment: number;
@@ -264,13 +267,11 @@ export type MortgageBreakdown = {
   projected_ltv_pct: number | null;
 };
 
-export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YEARS):
-  Promise<MortgageBreakdown | null>
-{
+export async function getMortgageBreakdown(amortYearsArg?: number): Promise<MortgageBreakdown | null> {
   const supabase = await createServerSupabaseClient();
   const { data: property } = await supabase
     .from("properties")
-    .select("current_value, mortgage_balance, interest_rate")
+    .select("current_value, mortgage_balance, interest_rate, monthly_payment, amort_years")
     .limit(1)
     .maybeSingle();
   if (!property) return null;
@@ -278,6 +279,10 @@ export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YE
   const value = property.current_value != null ? Number(property.current_value) : null;
   const balance = property.mortgage_balance != null ? Number(property.mortgage_balance) : 0;
   const rate = property.interest_rate != null ? Number(property.interest_rate) : 0;
+  const amortYears =
+    amortYearsArg ?? (property.amort_years != null ? Number(property.amort_years) : DEFAULT_AMORT_YEARS);
+  const overridePmt =
+    property.monthly_payment != null ? Number(property.monthly_payment) : null;
 
   if (balance <= 0 || rate <= 0) {
     return {
@@ -285,7 +290,8 @@ export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YE
       mortgage_balance: balance,
       interest_rate_pct: rate,
       amort_years: amortYears,
-      scheduled_monthly_payment: 0,
+      scheduled_monthly_payment: overridePmt ?? 0,
+      payment_is_override: overridePmt != null,
       this_month_interest: 0,
       this_month_principal: 0,
       projected_balance_after_payment: balance,
@@ -297,7 +303,8 @@ export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YE
   }
 
   const monthlyRate = rate / 100 / 12;
-  const pmt = scheduledMonthlyPayment(balance, rate, amortYears);
+  const computedPmt = scheduledMonthlyPayment(balance, rate, amortYears);
+  const pmt = overridePmt && overridePmt > 0 ? overridePmt : computedPmt;
   const interest = balance * monthlyRate;
   const principal = Math.max(0, pmt - interest);
   const newBalance = Math.max(0, balance - principal);
@@ -308,6 +315,7 @@ export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YE
     interest_rate_pct: rate,
     amort_years: amortYears,
     scheduled_monthly_payment: pmt,
+    payment_is_override: overridePmt != null && overridePmt > 0,
     this_month_interest: interest,
     this_month_principal: principal,
     projected_balance_after_payment: newBalance,
@@ -316,6 +324,110 @@ export async function getMortgageBreakdown(amortYears: number = DEFAULT_AMORT_YE
     current_ltv_pct: value && value > 0 ? (balance / value) * 100 : null,
     projected_ltv_pct: value && value > 0 ? (newBalance / value) * 100 : null,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Owner-side mortgage edit
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type MortgageEditInput = {
+  propertyValue?: number | null;
+  mortgageBalance?: number | null;
+  interestRatePct?: number | null;
+  monthlyPayment?: number | null;        // null to clear override and use PMT
+  amortYears?: number | null;
+  lender?: string | null;
+};
+
+export type MortgageEditResult = {
+  success: boolean;
+  error?: string;
+  breakdown?: MortgageBreakdown;
+  log_id?: string;
+};
+
+export async function updateMortgageProfile(
+  input: MortgageEditInput
+): Promise<MortgageEditResult> {
+  const supabase = await createServerSupabaseClient();
+  const admin = createAdminClient();
+
+  // Auth gate
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role, name")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile || (profile.role !== "owner" && profile.role !== "manager")) {
+    return { success: false, error: "Insufficient permissions" };
+  }
+
+  // Resolve the (single) property row
+  const { data: property } = await admin
+    .from("properties")
+    .select("id, current_value, mortgage_balance, interest_rate, monthly_payment, amort_years, lender")
+    .limit(1)
+    .maybeSingle();
+  if (!property) return { success: false, error: "No property row to update" };
+
+  const patch: Record<string, unknown> = {};
+  if (input.propertyValue !== undefined) patch.current_value = input.propertyValue;
+  if (input.mortgageBalance !== undefined) patch.mortgage_balance = input.mortgageBalance;
+  if (input.interestRatePct !== undefined) patch.interest_rate = input.interestRatePct;
+  if (input.monthlyPayment !== undefined) patch.monthly_payment = input.monthlyPayment;
+  if (input.amortYears !== undefined) patch.amort_years = input.amortYears;
+  if (input.lender !== undefined) patch.lender = input.lender;
+
+  if (Object.keys(patch).length === 0) {
+    const breakdown = await getMortgageBreakdown();
+    return { success: true, breakdown: breakdown ?? undefined };
+  }
+
+  const { error: updErr } = await admin.from("properties").update(patch).eq("id", property.id);
+  if (updErr) return { success: false, error: `Update failed: ${updErr.message}` };
+
+  const breakdown = await getMortgageBreakdown();
+
+  let logId: string | undefined;
+  try {
+    const { data: log } = await admin
+      .from("ai_logs")
+      .insert({
+        agent_name: "ledger-mortgage",
+        task_description: "update_mortgage_profile",
+        model_used: "deterministic",
+        token_cost: 0,
+        status: "succeeded",
+        output_data: {
+          property_id: property.id,
+          updated_by: profile.name,
+          updated_at: new Date().toISOString(),
+          before: {
+            current_value: property.current_value,
+            mortgage_balance: property.mortgage_balance,
+            interest_rate: property.interest_rate,
+            monthly_payment: property.monthly_payment,
+            amort_years: property.amort_years,
+            lender: property.lender,
+          },
+          patch,
+          new_breakdown: breakdown,
+        } as Record<string, unknown>,
+      })
+      .select("id")
+      .single();
+    logId = log?.id;
+  } catch {
+    /* best-effort */
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/finance");
+  revalidatePath("/equity");
+
+  return { success: true, breakdown: breakdown ?? undefined, log_id: logId };
 }
 
 export type ApplyPaymentResult = {
@@ -443,6 +555,7 @@ export async function applyMortgagePayment(
     interest_rate_pct: rate,
     amort_years: DEFAULT_AMORT_YEARS,
     scheduled_monthly_payment: scheduled,
+    payment_is_override: false,
     this_month_interest: interest,
     this_month_principal: principal,
     projected_balance_after_payment: newBalance,
