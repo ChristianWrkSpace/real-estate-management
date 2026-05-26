@@ -109,6 +109,45 @@ export default function HelpPage() {
 
       <Section
         n="4"
+        title="End a lease / free up a unit"
+        body={
+          <>
+            <P>
+              Move-outs, evictions, mutual termination — same flow. Open the
+              tenant&apos;s drawer and scroll to <Strong>End lease /
+              move-out</Strong>:
+            </P>
+            <Ol>
+              <li>
+                Click <Strong>End [name]&apos;s lease</Strong> to expand the form.
+              </li>
+              <li>
+                Pick the move-out date (defaults to today) and optionally enter a
+                reason for the audit log.
+              </li>
+              <li>
+                Type the confirmation phrase (e.g. <Code>END CHRISTIAN</Code>)
+                and click the red end-lease button.
+              </li>
+              <li>
+                The lease becomes <Strong>terminated</Strong>, the unit flips to{" "}
+                <Strong>vacant</Strong> (ready for the next tenant), and the
+                tenant&apos;s status moves to <Strong>former</Strong>. Their
+                record stays — historical leases, signed documents, payment
+                history, all preserved.
+              </li>
+            </Ol>
+            <Callout>
+              To put a new tenant in that unit, go to <Code>Tenants → + Add
+              Tenant</Code> (or convert an existing prospect) and select the
+              now-vacant unit.
+            </Callout>
+          </>
+        }
+      />
+
+      <Section
+        n="5"
         title="Send a lease for e-signature"
         body={
           <>
@@ -140,7 +179,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="5"
+        n="6"
         title="Collect rent"
         body={
           <>
@@ -168,7 +207,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="6"
+        n="7"
         title="Work orders"
         body={
           <>
@@ -192,7 +231,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="7"
+        n="8"
         title="Contracts & template library"
         body={
           <>
@@ -219,7 +258,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="8"
+        n="9"
         title="See the money — P&L, Equity, Dashboard"
         body={
           <>
@@ -242,7 +281,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="9"
+        n="10"
         title="Approvals queue (high-stakes actions)"
         body={
           <>
@@ -258,7 +297,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="10"
+        n="11"
         title="Roles — who sees what"
         body={
           <>
@@ -285,7 +324,7 @@ export default function HelpPage() {
       />
 
       <Section
-        n="11"
+        n="12"
         title="Common gotchas"
         body={
           <>

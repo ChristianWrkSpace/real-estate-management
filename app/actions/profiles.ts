@@ -561,3 +561,108 @@ export async function activateProspectLease(
 
   return { success: true, lease_id: lease.id, onboarding_url: onboardingUrl };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// End active lease (move-out, eviction, lease termination)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type EndLeaseInput = {
+  tenantId: string;
+  endDate?: string;       // YYYY-MM-DD, defaults to today
+  reason?: string | null; // free-text, audit only
+};
+
+export type EndLeaseResult = {
+  success: boolean;
+  error?: string;
+  unit_freed?: boolean;
+  unit_number?: string | null;
+};
+
+export async function endActiveLease(
+  input: EndLeaseInput
+): Promise<EndLeaseResult> {
+  const auth = await requireOwnerOrManager();
+  if (!auth.ok) return { success: false, error: auth.error };
+  if (!input.tenantId) return { success: false, error: "tenantId required" };
+
+  const admin = createAdminClient();
+
+  const { data: tenant } = await admin
+    .from("tenants")
+    .select("id, first_name, last_name")
+    .eq("id", input.tenantId)
+    .maybeSingle();
+  if (!tenant) return { success: false, error: "Tenant not found" };
+
+  const { data: lease } = await admin
+    .from("leases")
+    .select("id, unit_id, monthly_rent, start_date")
+    .eq("tenant_id", input.tenantId)
+    .eq("status", "active")
+    .order("start_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!lease) {
+    return { success: false, error: "No active lease to end for this tenant" };
+  }
+
+  const endDate = input.endDate || new Date().toISOString().split("T")[0];
+
+  const { error: lErr } = await admin
+    .from("leases")
+    .update({ status: "terminated", end_date: endDate })
+    .eq("id", lease.id);
+  if (lErr) {
+    return { success: false, error: `Lease end failed: ${lErr.message}` };
+  }
+
+  let unitFreed = false;
+  let unitNumber: string | null = null;
+  const { data: remaining } = await admin
+    .from("leases")
+    .select("id")
+    .eq("unit_id", lease.unit_id)
+    .eq("status", "active");
+  if (!remaining || remaining.length === 0) {
+    await admin.from("units").update({ status: "vacant" }).eq("id", lease.unit_id);
+    unitFreed = true;
+  }
+  const { data: unit } = await admin
+    .from("units")
+    .select("unit_number")
+    .eq("id", lease.unit_id)
+    .maybeSingle();
+  unitNumber = unit?.unit_number ?? null;
+
+  await admin.from("tenants").update({ status: "former" }).eq("id", input.tenantId);
+
+  try {
+    await admin.from("ai_logs").insert({
+      agent_name: "profile-tenant",
+      task_description: "end_active_lease",
+      model_used: "deterministic",
+      token_cost: 0,
+      status: "succeeded",
+      output_data: {
+        tenant_id: tenant.id,
+        tenant_name: `${tenant.first_name} ${tenant.last_name}`,
+        lease_id: lease.id,
+        unit_id: lease.unit_id,
+        unit_number: unitNumber,
+        end_date: endDate,
+        unit_freed: unitFreed,
+        reason: input.reason ?? null,
+        ended_by: auth.profile.name,
+      } as Record<string, unknown>,
+    });
+  } catch {
+    /* best-effort */
+  }
+
+  revalidatePath("/tenants");
+  revalidatePath("/units");
+  revalidatePath("/dashboard");
+
+  return { success: true, unit_freed: unitFreed, unit_number: unitNumber };
+}

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { activateProspectLease, updateTenantProfile } from "@/app/actions/profiles";
+import { activateProspectLease, endActiveLease, updateTenantProfile } from "@/app/actions/profiles";
 import EditDrawerShell from "@/components/EditDrawerShell";
 import { Field, SectionHeader, DigitalLeaseLinkCard } from "@/components/UnitEditDrawer";
 import ContractLibrary from "@/components/ContractLibrary";
@@ -211,13 +211,24 @@ export default function TenantEditDrawer({
       </form>
 
       {tenant.active_lease_id ? (
-        <div className="mt-6 space-y-2">
-          <SectionHeader>Digital Lease Agreement</SectionHeader>
-          <DigitalLeaseLinkCard
-            leaseId={tenant.active_lease_id}
-            contextHint={`One-time-use 24-byte token. Send to ${tenant.first_name} via iMessage / WhatsApp; the link expires when accepted or regenerated.`}
-          />
-        </div>
+        <>
+          <div className="mt-6 space-y-2">
+            <SectionHeader>Digital Lease Agreement</SectionHeader>
+            <DigitalLeaseLinkCard
+              leaseId={tenant.active_lease_id}
+              contextHint={`One-time-use 24-byte token. Send to ${tenant.first_name} via iMessage / WhatsApp; the link expires when accepted or regenerated.`}
+            />
+          </div>
+          <div className="mt-6 space-y-2">
+            <SectionHeader>End lease / move-out</SectionHeader>
+            <EndLeaseCard
+              tenantId={tenant.id}
+              tenantFirstName={tenant.first_name}
+              unitNumber={tenant.active_lease_unit_number}
+              onEnded={onClose}
+            />
+          </div>
+        </>
       ) : (
         <div className="mt-6 space-y-2">
           <SectionHeader>Convert to Active Tenant</SectionHeader>
@@ -468,6 +479,157 @@ function ProspectActivationCard({
       >
         {isPending ? "Activating…" : `Activate Lease for ${tenantFirstName}`}
       </button>
+    </form>
+  );
+}
+
+function EndLeaseCard({
+  tenantId,
+  tenantFirstName,
+  unitNumber,
+  onEnded,
+}: {
+  tenantId: string;
+  tenantFirstName: string;
+  unitNumber: string | null;
+  onEnded: () => void;
+}) {
+  const router = useRouter();
+  const [expanded, setExpanded] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState("");
+  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
+  const [reason, setReason] = useState("");
+
+  const expected = `END ${tenantFirstName.toUpperCase()}`;
+  const canSubmit = confirm.trim() === expected;
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) {
+      setError(`Type ${expected} to confirm.`);
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const r = await endActiveLease({
+        tenantId,
+        endDate,
+        reason: reason.trim() || null,
+      });
+      if (r.success) {
+        router.refresh();
+        onEnded();
+      } else {
+        setError(r.error ?? "Could not end lease");
+      }
+    });
+  };
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="w-full rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-left text-xs text-rose-800 transition hover:border-rose-500/60 hover:bg-rose-500/15 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/15"
+      >
+        <p className="font-semibold">End {tenantFirstName}&apos;s lease</p>
+        <p className="mt-0.5 text-[11px] opacity-80">
+          Move-out, eviction, lease termination — frees{" "}
+          {unitNumber ? `Unit ${unitNumber}` : "the unit"} for the next tenant.
+        </p>
+      </button>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={submit}
+      className="space-y-3 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 dark:border-rose-500/30"
+    >
+      <p className="text-xs text-rose-800 dark:text-rose-200">
+        Ending this lease will:
+      </p>
+      <ul className="ml-4 list-disc space-y-1 text-[11px] text-rose-800 dark:text-rose-200/90 marker:text-rose-500">
+        <li>Set the lease&apos;s status to <strong>terminated</strong>.</li>
+        <li>
+          Flip {unitNumber ? <strong>Unit {unitNumber}</strong> : "the unit"} to{" "}
+          <strong>vacant</strong> (so you can assign someone else).
+        </li>
+        <li>
+          Move {tenantFirstName}&apos;s tenant status to <strong>former</strong>{" "}
+          (their history stays for the record).
+        </li>
+      </ul>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Field label="Move-out / end date">
+          <input
+            required
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className={inputClass}
+          />
+        </Field>
+        <Field label="Reason (optional, audit)">
+          <input
+            type="text"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Lease expired, eviction, mutual…"
+            className={inputClass}
+          />
+        </Field>
+      </div>
+
+      <label className="block space-y-1.5">
+        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
+          Type{" "}
+          <span className="font-mono text-rose-700 dark:text-rose-300">
+            {expected}
+          </span>{" "}
+          to confirm
+        </span>
+        <input
+          required
+          type="text"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          autoComplete="off"
+          className={inputClass}
+        />
+      </label>
+
+      {error && (
+        <p className="rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-2 text-xs font-medium text-rose-800 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
+          ⚠ {error}
+        </p>
+      )}
+
+      <div className="flex items-center gap-2 pt-1">
+        <button
+          type="submit"
+          disabled={isPending || !canSubmit}
+          className="flex-1 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? "Ending…" : `End lease for ${tenantFirstName}`}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setExpanded(false);
+            setError(null);
+            setConfirm("");
+            setReason("");
+          }}
+          disabled={isPending}
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-xs font-semibold text-zinc-800 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }
