@@ -1,349 +1,201 @@
-"use client";
-
-import { useState } from "react";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { getMonthSummary } from "@/app/actions/finance";
-import { addTransaction } from "@/app/actions/finance";
+import { getPerUnitPnl, getMortgageBreakdown } from "@/app/actions/ledger";
+import UnitLedgerGrid from "@/components/UnitLedgerGrid";
+import MortgageEquityTracker from "@/components/MortgageEquityTracker";
+import AddTransactionModal from "@/components/AddTransactionModal";
 
-export default function FinancePage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [formData, setFormData] = useState({
-    amount: "",
-    date: new Date().toISOString().split("T")[0],
-    type: "expense" as "income" | "expense",
-    category: "maintenance",
-    description: "",
+export const dynamic = "force-dynamic";
+
+const fmtUsd = (n: number, frac = 0) =>
+  n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: frac,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPending(true);
+const CATEGORY_BADGE: Record<string, string> = {
+  rent: "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+  late_fees: "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+  other_income: "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+  mortgage: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  mortgage_interest: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  mortgage_principal: "bg-blue-500/20 text-blue-200 border-blue-400/30",
+  insurance: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  utilities: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  property_tax: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  maintenance: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  pest_control: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+  landscaping: "bg-rose-500/20 text-rose-200 border-rose-400/30",
+};
 
-    // TODO: Implement transaction submission
-    setTimeout(() => {
-      setIsPending(false);
-      setIsModalOpen(false);
-      setFormData({
-        amount: "",
-        date: new Date().toISOString().split("T")[0],
-        type: "expense",
-        category: "maintenance",
-        description: "",
-      });
-    }, 500);
+export default async function FinancePage() {
+  const supabase = await createServerSupabaseClient();
+
+  const [pnl, mortgage] = await Promise.all([getPerUnitPnl(), getMortgageBreakdown()]);
+
+  const { data: txs } = await supabase
+    .from("transactions")
+    .select("id, date, description, category, amount, type, unit_id")
+    .eq("property_id", pnl?.property_id ?? "00000000-0000-0000-0000-000000000000")
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  const unitNumberById = new Map((pnl?.units ?? []).map((u) => [u.unit_id, u.unit_number]));
+
+  const totals = pnl?.totals ?? {
+    income_ytd: 0,
+    expenses_ytd: 0,
+    net_cash_flow_ytd: 0,
+    common_area_expenses_ytd: 0,
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="space-y-8 p-8">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Finances</h1>
-          <p className="mt-1 text-white/60">1304 Rosario St, Laredo TX • P&L Dashboard</p>
+          <p className="mt-1 text-white/60">
+            {pnl?.property_name ?? "Property"} · Per-unit P&amp;L matrix · Live mortgage tracker
+          </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          + Add Transaction
-        </button>
+        <AddTransactionModal
+          propertyId={pnl?.property_id ?? null}
+          units={(pnl?.units ?? []).map((u) => ({ id: u.unit_id, unit_number: u.unit_number }))}
+        />
       </div>
 
-      {/* Summary Cards - Placeholder for server-rendered data */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mb-8">
-        {/* Total Income */}
-        <div className="rounded-xl border border-green-500/30 bg-green-500/5 p-6 backdrop-blur-xl">
-          <p className="text-sm font-medium text-green-300/80">Total Income</p>
-          <p className="mt-3 text-3xl font-bold text-green-300">$3,750</p>
-          <p className="mt-2 text-xs text-green-300/60">3 transactions</p>
-        </div>
-
-        {/* Total Expenses */}
-        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6 backdrop-blur-xl">
-          <p className="text-sm font-medium text-red-300/80">Total Expenses</p>
-          <p className="mt-3 text-3xl font-bold text-red-300">$2,280</p>
-          <p className="mt-2 text-xs text-red-300/60">7 transactions</p>
-        </div>
-
-        {/* Net Operating Income */}
-        <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-6 backdrop-blur-xl">
-          <p className="text-sm font-medium text-blue-300/80">Net Operating Income</p>
-          <p className="mt-3 text-3xl font-bold text-blue-300">+$1,470</p>
-          <p className="mt-2 text-xs text-blue-300/60">Healthy cash flow</p>
-        </div>
+      {/* Portfolio summary */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <SummaryCard
+          label="Total Income YTD"
+          value={fmtUsd(totals.income_ytd, 2)}
+          tone="emerald"
+        />
+        <SummaryCard
+          label="Total Expenses YTD"
+          value={fmtUsd(totals.expenses_ytd, 2)}
+          tone="rose"
+        />
+        <SummaryCard
+          label="Net Operating Income YTD"
+          value={`${totals.net_cash_flow_ytd >= 0 ? "+" : ""}${fmtUsd(totals.net_cash_flow_ytd, 2)}`}
+          tone={totals.net_cash_flow_ytd >= 0 ? "blue" : "rose"}
+        />
       </div>
 
-      {/* Transactions Ledger */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden backdrop-blur-sm">
-        <div className="overflow-x-auto">
+      {/* Mortgage + equity tracker */}
+      <section>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+          Mortgage & Equity
+        </h2>
+        <MortgageEquityTracker initial={mortgage} />
+      </section>
+
+      {/* Per-unit P&L grid */}
+      <section>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+          Per-Unit P&amp;L Matrix
+        </h2>
+        <UnitLedgerGrid data={pnl} />
+      </section>
+
+      {/* Transaction ledger */}
+      <section>
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+          Recent Transactions
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-sm">
           <table className="w-full">
-            <thead className="border-b border-white/10 bg-white/[0.05]">
+            <thead className="border-b border-white/10 bg-white/[0.04]">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/60">
+                  Date
+                </th>
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/60">
                   Description
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/60">
+                  Unit
+                </th>
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/60">
                   Category
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">
+                <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-white/60">
                   Amount
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 20</td>
-                <td className="px-6 py-4 text-sm text-white/80">Property tax installment</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    property_tax
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$350.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 15</td>
-                <td className="px-6 py-4 text-sm text-white/80">Unit 3 - Pest control treatment</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    pest_control
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$75.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 12</td>
-                <td className="px-6 py-4 text-sm text-white/80">Landscaping service</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    maintenance
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$200.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 10</td>
-                <td className="px-6 py-4 text-sm text-white/80">Water bill</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    utilities
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$120.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 08</td>
-                <td className="px-6 py-4 text-sm text-white/80">Unit 1 - Faucet repair</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    maintenance
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$150.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 07</td>
-                <td className="px-6 py-4 text-sm text-white/80">Landlord insurance premium</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    insurance
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$185.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 05</td>
-                <td className="px-6 py-4 text-sm text-white/80">Monthly mortgage payment</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300">
-                    mortgage
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-red-300">
-                  -$1,200.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 01</td>
-                <td className="px-6 py-4 text-sm text-white/80">Unit 4 - Monthly rent</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-300">
-                    rent
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-green-300">
-                  +$1,250.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 01</td>
-                <td className="px-6 py-4 text-sm text-white/80">Unit 3 - Monthly rent</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-300">
-                    rent
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-green-300">
-                  +$1,250.00
-                </td>
-              </tr>
-              <tr className="hover:bg-white/[0.05] transition">
-                <td className="px-6 py-4 text-sm text-white/80">May 01</td>
-                <td className="px-6 py-4 text-sm text-white/80">Unit 1 - Monthly rent</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-300">
-                    rent
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm font-semibold text-right text-green-300">
-                  +$1,250.00
-                </td>
-              </tr>
+            <tbody className="divide-y divide-white/5">
+              {(txs ?? []).map((t) => (
+                <tr key={t.id} className="text-sm transition hover:bg-white/[0.03]">
+                  <td className="px-5 py-3 text-white/70">
+                    {new Date(t.date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "2-digit",
+                    })}
+                  </td>
+                  <td className="px-5 py-3 text-white/85">{t.description ?? "—"}</td>
+                  <td className="px-5 py-3 text-white/60">
+                    {t.unit_id ? `#${unitNumberById.get(t.unit_id) ?? "?"}` : "—"}
+                  </td>
+                  <td className="px-5 py-3">
+                    <span
+                      className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                        CATEGORY_BADGE[t.category] ??
+                        (t.type === "income"
+                          ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/30"
+                          : "bg-rose-500/20 text-rose-200 border-rose-400/30")
+                      }`}
+                    >
+                      {t.category}
+                    </span>
+                  </td>
+                  <td
+                    className={`px-5 py-3 text-right font-semibold ${
+                      t.type === "income" ? "text-emerald-300" : "text-rose-300"
+                    }`}
+                  >
+                    {t.type === "income" ? "+" : "−"}
+                    {fmtUsd(Number(t.amount), 2)}
+                  </td>
+                </tr>
+              ))}
+              {(!txs || txs.length === 0) && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-white/40">
+                    No transactions yet. Click <span className="text-blue-300">+ Add Transaction</span>{" "}
+                    to log your first one.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
+    </div>
+  );
+}
 
-      {/* Add Transaction Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-6">Add Transaction</h2>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Type Selector */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-white/90">Type</label>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: "income" })}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition ${
-                      formData.type === "income"
-                        ? "bg-green-500/30 border border-green-500/50 text-green-300"
-                        : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"
-                    }`}
-                  >
-                    + Income
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: "expense" })}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition ${
-                      formData.type === "expense"
-                        ? "bg-red-500/30 border border-red-500/50 text-red-300"
-                        : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"
-                    }`}
-                  >
-                    - Expense
-                  </button>
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-white/90">Amount</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  required
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  placeholder="0.00"
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                />
-              </div>
-
-              {/* Date */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-white/90">Date</label>
-                <input
-                  type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                />
-              </div>
-
-              {/* Category */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-white/90">Category</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                >
-                  {formData.type === "income" ? (
-                    <>
-                      <option value="rent">Rent</option>
-                      <option value="late_fees">Late Fees</option>
-                      <option value="other_income">Other Income</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="maintenance">Maintenance</option>
-                      <option value="mortgage">Mortgage</option>
-                      <option value="insurance">Insurance</option>
-                      <option value="utilities">Utilities</option>
-                      <option value="property_tax">Property Tax</option>
-                      <option value="pest_control">Pest Control</option>
-                      <option value="landscaping">Landscaping</option>
-                      <option value="management">Management</option>
-                      <option value="other_expense">Other Expense</option>
-                    </>
-                  )}
-                </select>
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-white/90">Description</label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="e.g., Unit 1 - Faucet repair"
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-blue-500 focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={isPending}
-                  className="flex-1 rounded-lg border border-white/10 bg-white/5 py-3 px-4 font-semibold text-white/80 transition hover:bg-white/10 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="flex-1 rounded-lg bg-blue-600 py-3 px-4 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {isPending ? "Adding..." : "Add"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+function SummaryCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "emerald" | "rose" | "blue";
+}) {
+  const cls =
+    tone === "emerald"
+      ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-200"
+      : tone === "rose"
+        ? "border-rose-500/30 bg-rose-500/5 text-rose-200"
+        : "border-blue-500/30 bg-blue-500/5 text-blue-200";
+  return (
+    <div className={`rounded-xl border p-5 backdrop-blur-xl ${cls}`}>
+      <p className="text-xs font-semibold uppercase tracking-wider opacity-80">{label}</p>
+      <p className="mt-2 text-3xl font-bold">{value}</p>
     </div>
   );
 }
