@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { runFinancialAudit, type FinancialAuditReport } from "@/app/actions/agents";
+import TaxIntelligenceCard, { type TaxIntelligenceProps } from "@/components/TaxIntelligenceCard";
 
 type Props = {
   propertyName: string;
@@ -10,6 +11,7 @@ type Props = {
   noiYtd: number;
   monthlyRentRun: number;
   initialReport: FinancialAuditReport | null;
+  tax: TaxIntelligenceProps;
 };
 
 const fmtUsd = (n: number | null | undefined, frac = 0) =>
@@ -31,6 +33,7 @@ export default function GodModeWidget({
   noiYtd,
   monthlyRentRun,
   initialReport,
+  tax,
 }: Props) {
   const [report, setReport] = useState<FinancialAuditReport | null>(initialReport);
   const [open, setOpen] = useState(false);
@@ -85,6 +88,8 @@ export default function GodModeWidget({
             accent="purple"
           />
         </div>
+
+        <TaxIntelligenceCard {...tax} />
 
         <div className="mt-5 border-t border-white/10 pt-4">
           <button

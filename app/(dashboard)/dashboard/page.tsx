@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getLatestAuditReport } from "@/app/actions/agents";
+import { getLatestCadSync } from "@/app/actions/tax";
 import GodModeWidget from "@/components/GodModeWidget";
 
 export const dynamic = "force-dynamic";
@@ -76,6 +77,13 @@ export default async function DashboardPage() {
   const rentCollected = Math.floor(rentDue * 0.8);
 
   const initialReport = await getLatestAuditReport().catch(() => null);
+  const taxSync = await getLatestCadSync().catch(() => ({
+    cad: null,
+    delta: null,
+    internal_value: currentValue,
+    synced_at: null,
+    protest_deadline: null,
+  }));
 
   return (
     <div className="p-8">
@@ -93,6 +101,13 @@ export default async function DashboardPage() {
         noiYtd={noiYtd}
         monthlyRentRun={monthlyRentRun}
         initialReport={initialReport}
+        tax={{
+          initialCad: taxSync.cad,
+          initialDelta: taxSync.delta,
+          internalValue: taxSync.internal_value ?? currentValue,
+          syncedAt: taxSync.synced_at,
+          protestDeadline: taxSync.protest_deadline,
+        }}
       />
 
       {/* KPI Grid */}
