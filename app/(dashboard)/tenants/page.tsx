@@ -2,7 +2,9 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import RentLinkButton from "@/components/RentLinkButton";
 import LeasePdfUpload from "@/components/LeasePdfUpload";
 import OnboardInviteButton from "@/components/OnboardInviteButton";
+import EnforcementMenu from "@/components/EnforcementMenu";
 import { getLeaseDocumentMap } from "@/app/actions/leases";
+import { getDelinquencyMap } from "@/app/actions/legal";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,10 @@ export default async function TenantsPage() {
     .eq("property_id", property?.id || "");
 
   const tenantList = tenants ?? [];
-  const leaseDocs = await getLeaseDocumentMap(tenantList.map((t) => t.id));
+  const [leaseDocs, delinquency] = await Promise.all([
+    getLeaseDocumentMap(tenantList.map((t) => t.id)),
+    getDelinquencyMap(),
+  ]);
 
   return (
     <div className="p-8">
@@ -52,6 +57,9 @@ export default async function TenantsPage() {
               </th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">
                 Rent Collection
+              </th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">
+                Enforcement
               </th>
             </tr>
           </thead>
@@ -87,11 +95,19 @@ export default async function TenantsPage() {
                 <td className="px-6 py-4">
                   <RentLinkButton tenantId={tenant.id} />
                 </td>
+                <td className="px-6 py-4">
+                  <EnforcementMenu
+                    leaseId={delinquency[tenant.id]?.lease_id ?? null}
+                    isDelinquent={delinquency[tenant.id]?.is_delinquent ?? false}
+                    pastDueAmount={delinquency[tenant.id]?.past_due_amount ?? 0}
+                    unitNumber={delinquency[tenant.id]?.unit_number ?? null}
+                  />
+                </td>
               </tr>
             ))}
             {tenantList.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-sm text-white/40">
+                <td colSpan={7} className="px-6 py-8 text-center text-sm text-white/40">
                   No tenants yet. Add your first tenant to get started.
                 </td>
               </tr>

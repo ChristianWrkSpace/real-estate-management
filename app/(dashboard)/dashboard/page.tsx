@@ -5,6 +5,7 @@ import { getLatestCadSync } from "@/app/actions/tax";
 import { getLatestCapitalAnalysis } from "@/app/actions/capital";
 import { getLatestYieldAnalysis } from "@/app/actions/yield";
 import GodModeWidget from "@/components/GodModeWidget";
+import MaintenanceNoteForm from "@/components/MaintenanceNoteForm";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function DashboardPage() {
   const { data: properties } = await supabase.from("properties").select("*").limit(1);
   const property = properties?.[0];
 
-  const [unitsRes, workOrdersRes, txRes] = await Promise.all([
+  const [unitsRes, workOrdersRes, txRes, vendorsRes, unitsFullRes] = await Promise.all([
     supabase
       .from("units")
       .select("id, status")
@@ -34,6 +35,15 @@ export default async function DashboardPage() {
       .select("type, category, amount, date")
       .eq("property_id", property?.id || "")
       .gte("date", `${new Date().getFullYear()}-01-01`),
+    supabase
+      .from("vendors")
+      .select("id, name, trade")
+      .order("name"),
+    supabase
+      .from("units")
+      .select("id, unit_number")
+      .eq("property_id", property?.id || "")
+      .order("unit_number"),
   ]);
 
   const units: UnitRow[] = (unitsRes.data ?? []) as UnitRow[];
@@ -163,6 +173,14 @@ export default async function DashboardPage() {
           <QuickActionButton href="/tenants" label="Tenants" icon="👥" />
           <QuickActionButton href="/finance" label="P&L" icon="📈" />
         </div>
+      </div>
+
+      {/* Maintenance note */}
+      <div className="mt-8">
+        <MaintenanceNoteForm
+          units={unitsFullRes.data ?? []}
+          vendors={vendorsRes.data ?? []}
+        />
       </div>
 
       {/* Property Info */}
