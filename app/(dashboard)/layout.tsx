@@ -46,32 +46,36 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white">
+    <div className="flex h-screen bg-[#09090b] text-zinc-100">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 bg-white/[0.02] p-6 flex flex-col">
-        <Link href="/dashboard" className="mb-8 flex items-center gap-2">
-          <span className="text-2xl">🏢</span>
+      <aside className="flex w-64 flex-col border-r border-white/[0.06] bg-white/[0.015] p-6 backdrop-blur-xl">
+        <Link href="/dashboard" className="mb-8 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-blue-600 shadow-lg shadow-emerald-500/20">
+            <span className="text-base">🏠</span>
+          </div>
           <div>
-            <div className="font-bold text-lg">PropMan OS</div>
-            <div className="text-xs text-white/40">Rosario St, Laredo</div>
+            <div className="text-sm font-semibold tracking-tight text-zinc-100">PropMan OS</div>
+            <div className="text-[10px] uppercase tracking-wider text-zinc-500">
+              Rosario St · Laredo
+            </div>
           </div>
         </Link>
 
-        <nav className="flex-1 space-y-8 overflow-y-auto">
+        <nav className="flex-1 space-y-6 overflow-y-auto">
           {NAV_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="mb-2 text-xs font-semibold text-white/50 uppercase tracking-wider">
+              <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
                 {section.title}
               </h3>
-              <ul className="space-y-1">
+              <ul className="space-y-0.5">
                 {section.items.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-white/5"
+                      className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-zinc-300 transition hover:bg-white/[0.04] hover:text-zinc-100"
                     >
-                      <span>{item.icon}</span>
-                      {item.label}
+                      <span className="text-base">{item.icon}</span>
+                      <span>{item.label}</span>
                     </Link>
                   </li>
                 ))}
@@ -80,16 +84,16 @@ export default async function DashboardLayout({
           ))}
         </nav>
 
-        {/* User section */}
-        <div className="space-y-3 border-t border-white/10 pt-4">
-          <div className="text-sm">
-            <p className="font-medium">{user.name}</p>
-            <p className="text-xs text-white/50">{user.role}</p>
+        {/* User block */}
+        <div className="mt-6 space-y-2.5 border-t border-white/[0.06] pt-4">
+          <div>
+            <p className="text-sm font-semibold tracking-tight text-zinc-100">{user.name}</p>
+            <p className="text-[10px] uppercase tracking-wider text-zinc-500">{user.role}</p>
           </div>
           <form action={signOut}>
             <button
               type="submit"
-              className="w-full rounded bg-white/5 px-3 py-2 text-sm hover:bg-white/10"
+              className="w-full rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-zinc-300 transition hover:border-white/[0.15] hover:bg-white/[0.06] hover:text-zinc-100"
             >
               Sign Out
             </button>
