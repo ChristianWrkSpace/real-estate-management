@@ -2,9 +2,28 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient, createServerSupabaseClient } from "@/lib/supabase-server";
-import { fillDocxTemplate } from "@/lib/contract-templates";
+import { extractPlaceholders, fillDocxTemplate } from "@/lib/contract-templates";
 
 const BUCKET = "contracts";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Auth helper (mirrors profiles.ts)
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function requireOwnerOrManager() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false as const, error: "Not authenticated" };
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role, name")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile || (profile.role !== "owner" && profile.role !== "manager")) {
+    return { ok: false as const, error: "Insufficient permissions" };
+  }
+  return { ok: true as const, user, profile };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Read helpers
@@ -21,14 +40,215 @@ export type ContractTemplate = {
   active: boolean;
 };
 
-export async function listContractTemplates(): Promise<ContractTemplate[]> {
+export async function listContractTemplates(opts: {
+  includeInactive?: boolean;
+} = {}): Promise<ContractTemplate[]> {
   const supabase = await createServerSupabaseClient();
+  let q = supabase
+    .from("contract_templates")
+    .select(
+      "id, kind, label, description, storage_key, file_extension, placeholders, active"
+    );
+  if (!opts.includeInactive) q = q.eq("active", true);
+  const { data } = await q.order("label");
+  return (data ?? []) as ContractTemplate[];
+}
+
+/**
+ * Owner-facing detail bundle — template metadata + a signed download
+ * URL for the source .docx so the contracts page can offer "Download
+ * original" and "Preview" actions.
+ */
+export type ContractTemplateDetail = ContractTemplate & {
+  uploaded_at: string | null;
+  download_url: string | null;
+};
+
+export async function listContractTemplatesWithUrls(): Promise<ContractTemplateDetail[]> {
+  const supabase = await createServerSupabaseClient();
+  const admin = createAdminClient();
   const { data } = await supabase
     .from("contract_templates")
-    .select("id, kind, label, description, storage_key, file_extension, placeholders, active")
-    .eq("active", true)
+    .select(
+      "id, kind, label, description, storage_key, file_extension, placeholders, active, uploaded_at"
+    )
     .order("label");
-  return (data ?? []) as ContractTemplate[];
+
+  const rows = (data ?? []) as (ContractTemplate & { uploaded_at: string | null })[];
+
+  return Promise.all(
+    rows.map(async (r) => {
+      const { data: signed } = await admin.storage
+        .from(BUCKET)
+        .createSignedUrl(r.storage_key, 60 * 60 * 24 * 7);
+      return { ...r, download_url: signed?.signedUrl ?? null };
+    })
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Template metadata edit + replace
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type UpdateTemplateInput = {
+  templateId: string;
+  label?: string;
+  description?: string | null;
+  active?: boolean;
+};
+
+export type UpdateTemplateResult = {
+  success: boolean;
+  error?: string;
+};
+
+export async function updateContractTemplate(
+  input: UpdateTemplateInput
+): Promise<UpdateTemplateResult> {
+  const auth = await requireOwnerOrManager();
+  if (!auth.ok) return { success: false, error: auth.error };
+
+  const admin = createAdminClient();
+  const patch: Record<string, unknown> = {};
+  if (input.label !== undefined) patch.label = input.label.trim();
+  if (input.description !== undefined)
+    patch.description = input.description?.trim() || null;
+  if (input.active !== undefined) patch.active = input.active;
+
+  if (Object.keys(patch).length === 0) return { success: true };
+
+  const { data: before } = await admin
+    .from("contract_templates")
+    .select("label, description, active, kind")
+    .eq("id", input.templateId)
+    .maybeSingle();
+  if (!before) return { success: false, error: "Template not found" };
+
+  const { error } = await admin
+    .from("contract_templates")
+    .update(patch)
+    .eq("id", input.templateId);
+  if (error) return { success: false, error: `Update failed: ${error.message}` };
+
+  try {
+    await admin.from("ai_logs").insert({
+      agent_name: "contract-template",
+      task_description: "update_template_metadata",
+      model_used: "deterministic",
+      token_cost: 0,
+      status: "succeeded",
+      output_data: {
+        template_id: input.templateId,
+        kind: before.kind,
+        updated_by: auth.profile.name,
+        updated_at: new Date().toISOString(),
+        before,
+        patch,
+      } as Record<string, unknown>,
+    });
+  } catch {
+    /* best-effort */
+  }
+
+  revalidatePath("/contracts");
+  revalidatePath("/tenants");
+  return { success: true };
+}
+
+export type ReplaceTemplateResult = {
+  success: boolean;
+  error?: string;
+  placeholders?: string[];
+  new_storage_key?: string;
+};
+
+/**
+ * Owner uploads a new version of an existing template (or registers a
+ * brand-new template under the kind in the FormData). Replaces the
+ * docx in storage, re-extracts placeholders, and updates the registry
+ * row. The file must be a .docx.
+ */
+export async function replaceContractTemplate(
+  formData: FormData
+): Promise<ReplaceTemplateResult> {
+  const auth = await requireOwnerOrManager();
+  if (!auth.ok) return { success: false, error: auth.error };
+
+  const templateId = formData.get("templateId");
+  const file = formData.get("file");
+  if (typeof templateId !== "string" || !templateId) {
+    return { success: false, error: "templateId required" };
+  }
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Upload a .docx file" };
+  }
+  if (file.size > 25 * 1024 * 1024) {
+    return { success: false, error: "File exceeds 25MB" };
+  }
+  if (!file.name.toLowerCase().endsWith(".docx")) {
+    return { success: false, error: "Only .docx templates are supported right now" };
+  }
+
+  const admin = createAdminClient();
+
+  const { data: existing } = await admin
+    .from("contract_templates")
+    .select("id, kind, storage_key")
+    .eq("id", templateId)
+    .maybeSingle();
+  if (!existing) return { success: false, error: "Template not found" };
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const placeholders = await extractPlaceholders(buffer);
+
+  const key = existing.storage_key || `templates/${existing.kind}.docx`;
+  const { error: upErr } = await admin.storage.from(BUCKET).upload(key, buffer, {
+    contentType:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    upsert: true,
+  });
+  if (upErr) return { success: false, error: `Upload failed: ${upErr.message}` };
+
+  const { error: regErr } = await admin
+    .from("contract_templates")
+    .update({
+      storage_key: key,
+      file_extension: "docx",
+      placeholders,
+      uploaded_at: new Date().toISOString(),
+    })
+    .eq("id", templateId);
+  if (regErr) return { success: false, error: `Registry update failed: ${regErr.message}` };
+
+  try {
+    await admin.from("ai_logs").insert({
+      agent_name: "contract-template",
+      task_description: "replace_template_source",
+      model_used: "deterministic",
+      token_cost: 0,
+      status: "succeeded",
+      output_data: {
+        template_id: templateId,
+        kind: existing.kind,
+        storage_key: key,
+        file_size_bytes: buffer.length,
+        placeholders,
+        uploaded_by: auth.profile.name,
+        uploaded_at: new Date().toISOString(),
+      } as Record<string, unknown>,
+    });
+  } catch {
+    /* swallow */
+  }
+
+  revalidatePath("/contracts");
+  revalidatePath("/tenants");
+
+  return {
+    success: true,
+    placeholders,
+    new_storage_key: key,
+  };
 }
 
 export type TenantDocument = {
