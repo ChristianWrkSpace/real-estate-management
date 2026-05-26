@@ -23,12 +23,9 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Placeholder for other provider clients (would be initialized similarly)
-// In production, you'd initialize OpenAI, Google, DeepSeek, Groq clients here
-const openaiClient = process.env.OPENAI_API_KEY ? require("openai") : null;
-const googleClient = process.env.GOOGLE_API_KEY ? require("@google/generative-ai") : null;
-const deepseekClient = process.env.DEEPSEEK_API_KEY ? { apiKey: process.env.DEEPSEEK_API_KEY } : null;
-const groqClient = process.env.GROQ_API_KEY ? { apiKey: process.env.GROQ_API_KEY } : null;
+// Other provider SDKs (openai, @google/generative-ai, etc.) are loaded
+// lazily inside their per-provider methods so the bundle doesn't fail to
+// resolve modules that haven't been installed yet.
 
 export class AIClient {
   private costCap: number = 50; // USD per day

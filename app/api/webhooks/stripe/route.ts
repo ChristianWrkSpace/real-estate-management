@@ -4,16 +4,22 @@ import { createAdminClient } from "@/lib/supabase-server";
 
 export const runtime = "nodejs";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+function getStripe(): { stripe: Stripe; webhookSecret: string } | null {
+  const key = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!key || !webhookSecret) return null;
+  return { stripe: new Stripe(key), webhookSecret };
+}
 
 export async function POST(request: NextRequest) {
-  if (!webhookSecret) {
+  const cfg = getStripe();
+  if (!cfg) {
     return Response.json(
-      { error: "STRIPE_WEBHOOK_SECRET not configured" },
+      { error: "Stripe env vars not configured (STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET)" },
       { status: 500 }
     );
   }
+  const { stripe, webhookSecret } = cfg;
 
   const sig = request.headers.get("stripe-signature");
   if (!sig) {
