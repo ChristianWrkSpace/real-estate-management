@@ -1,30 +1,46 @@
-/* Tailwind v4 — single import generates base + components + utilities.
-   The legacy v3 directives (@tailwind base/components/utilities) are no-ops
-   in v4 and were the root cause of the missing utility classes (grid,
-   bg-zinc-*, backdrop-blur-*, etc.) on production. */
+/* Tailwind v4 — single import generates base + components + utilities. */
 @import "tailwindcss";
 
-/* Force a permanent dark surface regardless of OS color-scheme preference.
-   We never render a light mode — this prevents prefers-color-scheme media
-   queries from flashing white before the body classes apply. */
+/* Enable class-based dark mode for Tailwind v4. Any descendant of <html class="dark">
+   will have `dark:` variants applied. */
+@custom-variant dark (&:where(html.dark, html.dark *));
+
+/* Semantic canvas tokens. The :root values are LIGHT mode; html.dark
+   flips them. Use them via bg-[var(--canvas)] when a value needs to
+   respond automatically to theme without writing a `dark:` variant. */
 :root {
+  color-scheme: light;
+  --canvas: #f5f5f7;       /* zinc-100ish — Apple-style soft white */
+  --canvas-elev: #ffffff;
+  --fg: #18181b;           /* zinc-900 */
+  --fg-muted: #52525b;     /* zinc-600 */
+  --border: rgba(0, 0, 0, 0.08);
+  --card: rgba(255, 255, 255, 0.7);
+}
+
+html.dark {
   color-scheme: dark;
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  --canvas: #09090b;
+  --canvas-elev: #18181b;
+  --fg: #f4f4f5;
+  --fg-muted: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.08);
+  --card: rgba(24, 24, 27, 0.8);
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--canvas);
+  color: var(--fg);
   font-family:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Optional convenience utility for legacy components — current pattern is to
-   compose Tailwind classes directly. */
+/* Optional convenience utility for legacy components. */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
 }

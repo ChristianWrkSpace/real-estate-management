@@ -13,10 +13,14 @@ export type BottomNavUser = {
   role: Role;
 };
 
-const ACTIVE_CLASS =
-  "text-zinc-100 [&_svg]:stroke-emerald-400 [&_svg]:fill-emerald-400/[0.08]";
-const INACTIVE_CLASS =
-  "text-zinc-500 [&_svg]:stroke-zinc-500 hover:text-zinc-300 hover:[&_svg]:stroke-zinc-300";
+const ACTIVE_TEXT = "text-zinc-900 dark:text-white";
+const INACTIVE_TEXT =
+  "text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300";
+
+const ACTIVE_ICON =
+  "[&_svg]:stroke-emerald-600 dark:[&_svg]:stroke-emerald-400";
+const INACTIVE_ICON =
+  "[&_svg]:stroke-zinc-500 dark:[&_svg]:stroke-zinc-500 group-hover:[&_svg]:stroke-zinc-700 dark:group-hover:[&_svg]:stroke-zinc-300";
 
 export default function BottomNav({ user }: { user: BottomNavUser }) {
   const pathname = usePathname() || "";
@@ -29,15 +33,15 @@ export default function BottomNav({ user }: { user: BottomNavUser }) {
 
   return (
     <>
-      {/* Soft top fade so content scrolling under doesn't crash into the bar */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-28 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent" />
+      {/* Soft top fade — content scrolling underneath dissolves into the bar */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-t from-[var(--canvas)] via-[var(--canvas)]/85 to-transparent" />
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 flex justify-center"
-        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
+        className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.75rem)" }}
         aria-label="Primary"
       >
-        <div className="mx-3 mb-2 flex w-full max-w-md items-stretch justify-between gap-1 rounded-2xl border border-white/[0.06] bg-zinc-950/70 px-2 py-1.5 shadow-[0_12px_48px_-12px_rgba(0,0,0,0.7)] backdrop-blur-2xl supports-[backdrop-filter]:bg-zinc-950/50">
+        <div className="flex w-full max-w-xl items-stretch justify-between gap-1.5 rounded-3xl border border-zinc-200 bg-white/85 px-2.5 py-2.5 shadow-[0_24px_64px_-12px_rgba(0,0,0,0.18)] backdrop-blur-2xl dark:border-white/[0.08] dark:bg-zinc-900/70 dark:shadow-[0_24px_64px_-12px_rgba(0,0,0,0.7)] supports-[backdrop-filter]:bg-white/65 dark:supports-[backdrop-filter]:bg-zinc-900/55">
           <Tab href="/dashboard" label="Home" active={isActive("/dashboard")}>
             <IconHome />
           </Tab>
@@ -47,7 +51,11 @@ export default function BottomNav({ user }: { user: BottomNavUser }) {
           <Tab href="/tenants" label="Tenants" active={isActive("/tenants")}>
             <IconUsers />
           </Tab>
-          <Tab href="/finance" label="P&L" active={isActive("/finance") || isActive("/pnl")}>
+          <Tab
+            href="/finance"
+            label="P&L"
+            active={isActive("/finance") || isActive("/pnl")}
+          >
             <IconChart />
           </Tab>
           <MoreTab onClick={() => setMoreOpen(true)} active={moreOpen}>
@@ -75,21 +83,21 @@ function Tab({
   return (
     <Link
       href={href}
-      className={`group relative flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 active:scale-95 ${
-        active ? ACTIVE_CLASS : INACTIVE_CLASS
+      className={`group relative flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 active:scale-95 ${
+        active
+          ? `${ACTIVE_TEXT} ${ACTIVE_ICON} bg-emerald-500/[0.10] dark:bg-emerald-500/[0.10]`
+          : `${INACTIVE_TEXT} ${INACTIVE_ICON}`
       }`}
       aria-current={active ? "page" : undefined}
+      style={{ minHeight: 64 }}
     >
-      <span className="relative flex h-7 w-7 items-center justify-center">
+      <span className="relative flex h-8 w-8 items-center justify-center">
         {children}
         {active && (
-          <span className="absolute inset-0 -z-10 rounded-lg bg-emerald-400/10 blur-md" />
+          <span className="absolute inset-0 -z-10 rounded-xl bg-emerald-400/20 blur-lg" />
         )}
       </span>
-      <span className="text-[10px] font-semibold tracking-wide">{label}</span>
-      {active && (
-        <span className="absolute bottom-0 h-[3px] w-7 -translate-y-px rounded-full bg-gradient-to-r from-emerald-400 to-blue-500" />
-      )}
+      <span className="text-[11px] font-semibold tracking-wide">{label}</span>
     </Link>
   );
 }
@@ -107,31 +115,34 @@ function MoreTab({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-2 py-1.5 transition-all duration-300 active:scale-95 ${
-        active ? ACTIVE_CLASS : INACTIVE_CLASS
+      className={`group relative flex flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 active:scale-95 ${
+        active
+          ? `${ACTIVE_TEXT} ${ACTIVE_ICON} bg-emerald-500/[0.10]`
+          : `${INACTIVE_TEXT} ${INACTIVE_ICON}`
       }`}
       aria-haspopup="dialog"
       aria-expanded={active}
+      style={{ minHeight: 64 }}
     >
-      <span className="relative flex h-7 w-7 items-center justify-center">
+      <span className="relative flex h-8 w-8 items-center justify-center">
         {children}
         {active && (
-          <span className="absolute inset-0 -z-10 rounded-lg bg-emerald-400/10 blur-md" />
+          <span className="absolute inset-0 -z-10 rounded-xl bg-emerald-400/20 blur-lg" />
         )}
       </span>
-      <span className="text-[10px] font-semibold tracking-wide">More</span>
+      <span className="text-[11px] font-semibold tracking-wide">More</span>
     </button>
   );
 }
 
-// ── Heroicons-style outlines (24x24, stroke 1.75) ───────────────────────────
+// ── Heroicons-style outlines, sized for the larger dock ─────────────────────
 
 const ICON_PROPS = {
-  width: 22,
-  height: 22,
+  width: 26,
+  height: 26,
   viewBox: "0 0 24 24",
   fill: "none",
-  strokeWidth: 1.75,
+  strokeWidth: 1.8,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
 };
@@ -178,9 +189,9 @@ function IconChart() {
 function IconMore() {
   return (
     <svg {...ICON_PROPS}>
-      <circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
-      <circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="5.5" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="18.5" cy="12" r="1.6" fill="currentColor" stroke="none" />
     </svg>
   );
 }

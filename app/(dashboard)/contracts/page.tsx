@@ -55,7 +55,7 @@ export default async function ContractsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 p-6">
+    <div className="min-h-screen bg-[var(--canvas)] text-[var(--fg)] p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         <header>
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-100">

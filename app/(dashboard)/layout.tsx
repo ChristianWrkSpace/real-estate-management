@@ -14,8 +14,8 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100">
-      <main className="pb-28">{children}</main>
+    <div className="min-h-screen bg-[var(--canvas)] text-[var(--fg)]">
+      <main className="pb-36">{children}</main>
       <BottomNav
         user={{
           name: user.name,
