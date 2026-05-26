@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/auth-helpers";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getLatestAuditReport } from "@/app/actions/agents";
 import { getLatestCadSync } from "@/app/actions/tax";
+import { getLatestCapitalAnalysis } from "@/app/actions/capital";
 import GodModeWidget from "@/components/GodModeWidget";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
     synced_at: null,
     protest_deadline: null,
   }));
+  const capitalAnalysis = await getLatestCapitalAnalysis().catch(() => null);
 
   return (
     <div className="p-8">
@@ -108,6 +110,7 @@ export default async function DashboardPage() {
           syncedAt: taxSync.synced_at,
           protestDeadline: taxSync.protest_deadline,
         }}
+        capital={{ initial: capitalAnalysis }}
       />
 
       {/* KPI Grid */}
