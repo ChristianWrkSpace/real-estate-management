@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { runFinancialAudit, type FinancialAuditReport } from "@/app/actions/agents";
 import TaxIntelligenceCard, { type TaxIntelligenceProps } from "@/components/TaxIntelligenceCard";
 import CapitalStrategyCard, { type CapitalStrategyProps } from "@/components/CapitalStrategyCard";
+import YieldOptimizationCard, { type YieldOptimizationProps } from "@/components/YieldOptimizationCard";
 
 type Props = {
   propertyName: string;
@@ -14,6 +15,7 @@ type Props = {
   initialReport: FinancialAuditReport | null;
   tax: TaxIntelligenceProps;
   capital: CapitalStrategyProps;
+  yieldData: YieldOptimizationProps;
 };
 
 const fmtUsd = (n: number | null | undefined, frac = 0) =>
@@ -37,6 +39,7 @@ export default function GodModeWidget({
   initialReport,
   tax,
   capital,
+  yieldData,
 }: Props) {
   const [report, setReport] = useState<FinancialAuditReport | null>(initialReport);
   const [open, setOpen] = useState(false);
@@ -95,6 +98,8 @@ export default function GodModeWidget({
         <TaxIntelligenceCard {...tax} />
 
         <CapitalStrategyCard {...capital} />
+
+        <YieldOptimizationCard {...yieldData} />
 
         <div className="mt-5 border-t border-white/10 pt-4">
           <button
